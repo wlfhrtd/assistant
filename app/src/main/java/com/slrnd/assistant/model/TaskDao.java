@@ -19,16 +19,15 @@ public interface TaskDao {
     @Query("SELECT * FROM task")
     List<Task> selectAllTasks();
 
-    @Query("SELECT * FROM task WHERE is_done = 0")
+    @Query("SELECT * FROM task WHERE is_done = 0 ORDER BY date ASC") // TODO check asc or desc
     LiveData<List<Task>> getAllTasks();
 
     @Query("SELECT * FROM task WHERE id = :id")
     LiveData<Task> selectTask(Integer id);
 
     @Delete
-    void deleteTask(Task task);
+    void deleteTask(Task task); // shouldn't be used anywhere; use hide via is_done flag
 
     @Update
     void update(Task task);
-
 }

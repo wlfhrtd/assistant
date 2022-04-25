@@ -17,6 +17,15 @@ public abstract class TaskDatabase extends RoomDatabase {
 
     private static String DB_NAME = "task_database";
 
+    /* migration example
+    private static Migration MIGRATION_1_2 = new Migration(1,2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE task ADD COLUMN priority INTEGER DEFAULT 1 not null");
+        }
+    };
+     */
+
     public abstract TaskDao taskDao();
 
     private static volatile TaskDatabase INSTANCE;
@@ -32,6 +41,7 @@ public abstract class TaskDatabase extends RoomDatabase {
                             TaskDatabase.class,
                             DB_NAME
                     )
+                            // .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)  no migrations yet, version = 1
                             .build();
                 }
             }

@@ -16,14 +16,15 @@ public class Task {
     public String note;
     @ColumnInfo(name = "is_done")
     public int is_done;
-    @ColumnInfo(name = "task_date")
-    public long task_date;
+    @ColumnInfo(name = "date")
+    public long date;
 
-    public Task(String title, String note, long task_date) {
+    public Task(String title, String note, long date) {
+
         this.title = title;
         this.note = note;
         this.is_done = 0;
-        this.task_date = task_date;
+        this.date = date;
     }
 
     public Integer getId() {
@@ -41,5 +42,4 @@ public class Task {
     public void setTitle(String title) {
         this.title = title;
     }
-
 }

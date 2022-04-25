@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Assistant</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="emptytasklist">You don\'t have any tasks. Create new one</string>
+    <string name="newtask">New Task</string>
+    <string name="entertitle">Enter The Title</string>
+    <string name="enternote">Enter The Note</string>
+    <string name="createtask">Create Task</string>
+    <string name="edittask">Edit Task</string>
+    <string name="savechanges">Save Changes</string>
+    <string name="pickdate">Pick Date</string>
+    <string name="picktime">Pick Time</string>
 </resources>

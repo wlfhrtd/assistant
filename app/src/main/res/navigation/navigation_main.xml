@@ -11,12 +11,12 @@
         android:label="Main Screen"
         tools:layout="@layout/fragment_task_list">
         <action
-            android:id="@+id/actionCreateTodo"
+            android:id="@+id/actionCreateTask"
             app:destination="@id/createTaskFragment"
             app:enterAnim="@android:anim/fade_in"
             app:exitAnim="@android:anim/fade_out" />
         <action
-            android:id="@+id/actionEditTodoFragment"
+            android:id="@+id/actionEditTaskFragment"
             app:destination="@id/editTaskFragment"
             app:enterAnim="@android:anim/fade_in"
             app:exitAnim="@android:anim/fade_out" />

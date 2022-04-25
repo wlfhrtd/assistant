@@ -19,7 +19,7 @@ public interface TaskDao {
     @Query("SELECT * FROM task")
     List<Task> selectAllTasks();
 
-    @Query("SELECT * FROM task WHERE is_done = 0 ORDER BY date ASC") // TODO check asc or desc
+    @Query("SELECT * FROM task WHERE is_done = 0 ORDER BY date ASC")
     LiveData<List<Task>> getAllTasks();
 
     @Query("SELECT * FROM task WHERE id = :id")

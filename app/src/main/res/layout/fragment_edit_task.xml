@@ -10,7 +10,7 @@
             type="com.slrnd.assistant.model.Task" />
         <variable
             name="saveListener"
-            type="com.slrnd.assistant.view.TodoSaveChangesListener" />
+            type="com.slrnd.assistant.view.TaskSaveChangesListener" />
 
     </data>
 
@@ -87,7 +87,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="24dp"
-                android:onClick="@{(view) -> saveListener.onTodoSaveChanges(view, task)}"
+                android:onClick="@{(view) -> saveListener.onTaskSaveChanges(view, task)}"
                 android:text="@string/savechanges"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

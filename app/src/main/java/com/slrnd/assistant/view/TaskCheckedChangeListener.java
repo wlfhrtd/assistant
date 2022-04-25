@@ -4,6 +4,7 @@ import android.widget.CompoundButton;
 
 import com.slrnd.assistant.model.Task;
 
-public interface TodoCheckedChangeListener {
+public interface TaskCheckedChangeListener {
+
     void onCheckChanged(CompoundButton cb, Boolean isChecked, Task obj);
 }

@@ -10,10 +10,10 @@
             type="com.slrnd.assistant.model.Task" />
         <variable
             name="listener"
-            type="com.slrnd.assistant.view.TodoCheckedChangeListener" />
+            type="com.slrnd.assistant.view.TaskCheckedChangeListener" />
         <variable
             name="editListener"
-            type="com.slrnd.assistant.view.TodoEditClickListener" />
+            type="com.slrnd.assistant.view.TaskEditClickListener" />
 
     </data>
 

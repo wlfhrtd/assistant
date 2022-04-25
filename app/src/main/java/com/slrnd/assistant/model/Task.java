@@ -11,13 +11,13 @@ public class Task {
     private Integer id;
 
     @ColumnInfo(name = "title")
-    public String title;
+    private String title;
     @ColumnInfo(name = "note")
-    public String note;
+    private String note;
     @ColumnInfo(name = "is_done")
-    public int is_done;
+    private int is_done;
     @ColumnInfo(name = "date")
-    public long date;
+    private long date;
 
     public Task(String title, String note, long date) {
 
@@ -28,7 +28,7 @@ public class Task {
     }
 
     public Integer getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Integer id) {
@@ -41,5 +41,29 @@ public class Task {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public int getIs_done() {
+        return is_done;
+    }
+
+    public void setIs_done(int is_done) {
+        this.is_done = is_done;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
     }
 }

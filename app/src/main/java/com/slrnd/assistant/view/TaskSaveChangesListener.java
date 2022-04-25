@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.slrnd.assistant.model.Task;
 
-public interface TodoSaveChangesListener {
-    void onTodoSaveChanges(View v, Task obj);
+public interface TaskSaveChangesListener {
+
+    void onTaskSaveChanges(View v, Task obj);
 }

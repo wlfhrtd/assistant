@@ -10,7 +10,7 @@
             type="com.slrnd.assistant.model.Task" />
         <variable
             name="createButtonListener"
-            type="com.slrnd.assistant.view.TodoCreateButtonListener" />
+            type="com.slrnd.assistant.view.TaskCreateButtonListener" />
         <variable
             name="listener_date"
             type="com.slrnd.assistant.view.DateClickListener" />
@@ -98,7 +98,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="24dp"
                     android:layout_marginBottom="24dp"
-                    android:onClick="@{createButtonListener::onTodoCreateButton}"
+                    android:onClick="@{createButtonListener::onTaskCreateButton}"
                     android:text="@string/createtask"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -20,8 +20,8 @@ public class NotificationHelper {
 
     private Context context;
 
-    private String CHANNEL_ID = "todo_channel_id";
-    private String description = "Todo channel description";
+    private String CHANNEL_ID = "task_channel_id";
+    private String description = "Task channel description";
     private int NOTIFICATION_ID = 1;
 
     public NotificationHelper(Context context) {

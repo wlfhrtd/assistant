@@ -1,8 +1,10 @@
-package com.slrnd.assistant;
+package com.slrnd.assistant.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.slrnd.assistant.R;
 
 public class MainActivity extends AppCompatActivity {
 

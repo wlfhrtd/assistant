@@ -1,4 +1,4 @@
-package com.slrnd.assistant;
+package com.slrnd.assistant.view;
 
 import android.os.Bundle;
 
@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.slrnd.assistant.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TaskListFragment#newInstance} factory method to
+ * Use the {@link CreateTaskFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TaskListFragment extends Fragment {
+public class CreateTaskFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +26,7 @@ public class TaskListFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public TaskListFragment() {
+    public CreateTaskFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +36,11 @@ public class TaskListFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment TaskListFragment.
+     * @return A new instance of fragment CreateTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TaskListFragment newInstance(String param1, String param2) {
-        TaskListFragment fragment = new TaskListFragment();
+    public static CreateTaskFragment newInstance(String param1, String param2) {
+        CreateTaskFragment fragment = new CreateTaskFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,6 +61,6 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_task_list, container, false);
+        return inflater.inflate(R.layout.fragment_create_task, container, false);
     }
 }

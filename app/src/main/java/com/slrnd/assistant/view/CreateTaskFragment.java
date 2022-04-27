@@ -135,7 +135,7 @@ public class CreateTaskFragment extends Fragment implements
         if (this.tasks != null) {
             Log.d("SHIT", "ALLTASKS NOT NULL");
             for (int i = 0; i < this.tasks.size(); i++) {
-                if (this.tasks.get(i).getString_date().equals(task.getString_date())) {
+                if (this.tasks.get(i).getString_date().equals(task.getString_date()) && this.tasks.get(i).getString_time().equals(task.getString_time())) {
                     Log.d(task.getString_date(), "CATCH!");
                     Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
                     return;

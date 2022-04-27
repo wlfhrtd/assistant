@@ -14,8 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.model.Task;
@@ -69,7 +72,34 @@ public class TaskListFragment extends Fragment {
             @NonNull NavDirections action = TaskListFragmentDirections.actionCreateTask();
             Navigation.findNavController(view).navigate(action);
         });
+        // bottom sheet dialog for calendar view
+        LinearLayout bottomSheetLayout = view.findViewById(R.id.bottom_sheet_layout);
+        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+        ImageView headerArrowImage = view.findViewById(R.id.bottom_sheet_arrow);
+        headerArrowImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+                headerArrowImage.setRotation(slideOffset * -180);
+            }
+        });
+        // fetch
         observeViewModel();
     }
 

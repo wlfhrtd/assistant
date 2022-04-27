@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -42,6 +43,13 @@
             android:src="@drawable/ic_baseline_add_circle_outline_24"
             app:layout_constraintBottom_toBottomOf="@+id/recTodoList"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <include layout="@layout/bottom_sheet_dialog_layout" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/dev/android/Assistant/app/src/main/res/drawable/ic_baseline_access_time_24.xml" value="0.2985" />
+        <entry key="..\:/dev/android/Assistant/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2985" />
         <entry key="..\:/dev/android/Assistant/app/src/main/res/layout/activity_main.xml" value="0.358695652173913" />
+        <entry key="..\:/dev/android/Assistant/app/src/main/res/layout/bottom_sheet_dialog_layout.xml" value="0.358695652173913" />
         <entry key="..\:/dev/android/Assistant/app/src/main/res/layout/fragment_create_task.xml" value="0.358695652173913" />
         <entry key="..\:/dev/android/Assistant/app/src/main/res/layout/fragment_edit_task.xml" value="0.358695652173913" />
         <entry key="..\:/dev/android/Assistant/app/src/main/res/layout/fragment_task_list.xml" value="0.358695652173913" />

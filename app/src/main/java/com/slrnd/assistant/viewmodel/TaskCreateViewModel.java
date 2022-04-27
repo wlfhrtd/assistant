@@ -11,33 +11,21 @@ import com.slrnd.assistant.model.TaskRepository;
 
 import java.util.List;
 
-public class TaskListViewModel extends AndroidViewModel {
+public class TaskCreateViewModel extends AndroidViewModel {
 
     private TaskRepository taskRepository;
     public LiveData<List<Task>> taskLD;
 
-    public TaskListViewModel(@NonNull Application application) {
+    public TaskCreateViewModel(@NonNull Application application) {
 
         super(application);
 
         this.taskRepository = new TaskRepository(application);
-        this.taskLD = taskRepository.getTaskLiveData();
+        this.taskLD = this.taskRepository.getTaskLiveData();
     }
 
     public LiveData<List<Task>> getTaskLiveData() {
         return this.taskLD;
     }
 
-    public void clearTask(Task task) {
-
-        task.setIs_done(1);
-        this.taskRepository.update(task);
-        // reselect after deletion/hide
-        this.taskLD = this.taskRepository.getTaskLiveData();
-    }
-
-    /*
-    public void update(Task task) {
-        this.taskRepository.update(task);
-    }*/
 }

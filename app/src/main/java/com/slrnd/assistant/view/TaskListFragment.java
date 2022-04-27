@@ -71,7 +71,6 @@ public class TaskListFragment extends Fragment {
         });
 
         observeViewModel();
-
     }
 
     private void observeViewModel() {

@@ -2,19 +2,24 @@ package com.slrnd.assistant.view;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +28,22 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentCreateTaskBinding;
 import com.slrnd.assistant.model.Task;
+import com.slrnd.assistant.model.TaskRepository;
 import com.slrnd.assistant.util.TaskWorker;
+import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
+import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class CreateTaskFragment extends Fragment implements
@@ -45,6 +57,9 @@ public class CreateTaskFragment extends Fragment implements
 
     private TaskDetailsViewModel viewModel;
     private FragmentCreateTaskBinding binding;
+
+    private TaskCreateViewModel taskCreateViewModel;
+    private ArrayList<Task> tasks;
 
     private int year = 0;
     private int month = 0;
@@ -60,39 +75,107 @@ public class CreateTaskFragment extends Fragment implements
 
         this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_create_task, container, false);
 
+        this.tasks = new ArrayList<Task>();
+
         return this.binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
 
         this.viewModel = new ViewModelProvider(this).get(TaskDetailsViewModel.class);
+
+        this.taskCreateViewModel = new ViewModelProvider(this).get(TaskCreateViewModel.class);
 
         this.binding.setTask(new Task("", "", 0));
         this.binding.setCreateButtonListener(this);
         // date and time pickers
         this.binding.setListenerDate(this);
         this.binding.setListenerTime(this);
+
+        observeViewModel();
+    }
+
+    private void observeViewModel() {
+        this.taskCreateViewModel.taskLD.observe(getViewLifecycleOwner(), list -> {
+
+            this.updateTaskList(list);
+        });
+    }
+
+    public void updateTaskList(List<Task> newTasks) {
+
+        this.tasks.clear();
+        this.tasks.addAll(newTasks);
     }
 
     @Override
     public void onTaskCreateButton(View v) {
+        // get task obj
+        Task task = this.binding.getTask();
         // getting date (check listeners)
         Calendar calendar = Calendar.getInstance();
         calendar.set(this.year, this.month, this.day, this.hour, this.minute);
+
+        task.setString_date(
+                String.valueOf(this.year)
+                        + '-'
+                        + this.month
+                        + '-'
+                        + this.day
+        );
+        task.setString_time(
+                String.valueOf(this.hour)
+                        + '-'
+                        + this.minute
+        );
+
+        if (this.tasks != null) {
+            Log.d("SHIT", "ALLTASKS NOT NULL");
+            for (int i = 0; i < this.tasks.size(); i++) {
+                if (this.tasks.get(i).getString_date().equals(task.getString_date())) {
+                    Log.d(task.getString_date(), "CATCH!");
+                    Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
+
         Calendar today = Calendar.getInstance();
         // diff for work manager delay
         long diff = (calendar.getTimeInMillis() / 1000L) - (today.getTimeInMillis() / 1000L);
+
         // saving task date to task obj
-        this.binding.getTask().setDate(calendar.getTimeInMillis() / 1000L);
+        task.setDate(calendar.getTimeInMillis() / 1000L);
         // loading new task obj to LD; list for no reason w/e
-        List<Task> tasks = Arrays.asList(this.binding.getTask());
+        List<Task> tasks = Arrays.asList(task);
         this.viewModel.addTask(tasks);
 
         Toast.makeText(this.getContext(), "Task created", Toast.LENGTH_SHORT).show();
         // immediate notif
         // new NotificationHelper(this.getContext()).createNotification("Task Created", "The new task has been created");
+
+
+
+        // WorkManager.getInstance(requireContext()).enqueue(myWorkRequest); // uniqueness issue
+
+        WorkManager workManager = WorkManager.getInstance(requireContext());
+        // checking for existing/duplication; used task.date as uuid
+        String id = String.valueOf(task.getDate());
+
+        if (!isWorkScheduled(id, getContext())) {
+            scheduleWork(id, diff, workManager);
+        } else {
+            Log.d(id, "CATCH");
+            Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
+        }
+
+        Navigation.findNavController(v).popBackStack();
+    }
+
+    public void scheduleWork(String id, long diff, WorkManager workManager) {
 
         OneTimeWorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(TaskWorker.class)
                 .setInitialDelay(diff, TimeUnit.SECONDS)
@@ -102,9 +185,35 @@ public class CreateTaskFragment extends Fragment implements
                         .build())
                 .build();
 
-        WorkManager.getInstance(requireContext()).enqueue(myWorkRequest);
+        workManager.enqueueUniqueWork(
+                id,
+                ExistingWorkPolicy.KEEP,
+                myWorkRequest);
+    }
 
-        Navigation.findNavController(v).popBackStack();
+    private boolean isWorkScheduled(String id, Context context) {
+
+        WorkManager workManager = WorkManager.getInstance(context);
+
+        ListenableFuture<List<WorkInfo>> statuses = workManager.getWorkInfosForUniqueWork(id);
+
+        boolean running = false;
+        List<WorkInfo> workInfoList = Collections.emptyList();
+
+        try {
+            workInfoList = statuses.get();
+        } catch (ExecutionException e) {
+            Log.d(id, "ExecutionException in isWorkScheduled: " + e);
+        } catch (InterruptedException e) {
+            Log.d(id, "InterruptedException in isWorkScheduled: " + e);
+        }
+
+        for (WorkInfo workInfo : workInfoList) {
+            WorkInfo.State state = workInfo.getState();
+            running = running || (state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED);
+        }
+
+        return running;
     }
 
     @Override

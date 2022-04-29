@@ -8,23 +8,20 @@
         <variable
             name="task"
             type="com.slrnd.assistant.model.Task" />
-        <variable
-            name="saveListener"
-            type="com.slrnd.assistant.view.TaskSaveChangesListener" />
 
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.EditTaskFragment">
+        tools:context=".view.DetailsTaskFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/txtTitleTodo"
+                android:id="@+id/txtDetailsTaskFragmentTitle"
                 style="@style/TextAppearance.MaterialComponents.Headline3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

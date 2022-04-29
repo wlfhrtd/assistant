@@ -9,4 +9,6 @@
     <string name="savechanges">Save Changes</string>
     <string name="pickdate">Pick Date</string>
     <string name="picktime">Pick Time</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -12,9 +12,6 @@
             name="createButtonListener"
             type="com.slrnd.assistant.view.TaskCreateButtonListener" />
         <variable
-            name="listener_date"
-            type="com.slrnd.assistant.view.DateClickListener" />
-        <variable
             name="listener_time"
             type="com.slrnd.assistant.view.TimeClickListener" />
 
@@ -106,38 +103,12 @@
                     app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/textInputLayout3"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="24dp"
-                    android:hint="@string/pickdate"
-                    app:endIconDrawable="@drawable/ic_baseline_calendar_today_24"
-                    app:endIconMode="custom"
-                    app:hintAnimationEnabled="true"
-                    app:hintEnabled="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textInputLayout2">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txtDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:enabled="true"
-                        android:focusable="false"
-                        android:onClick="@{listener_date::onDateClick}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/textInputLayout4"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="24dp"
                     android:layout_marginEnd="24dp"
                     android:hint="@string/picktime"
                     app:endIconDrawable="@drawable/ic_baseline_access_time_24"
@@ -146,15 +117,15 @@
                     app:hintEnabled="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+                    app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txtTime"
-                        android:onClick="@{listener_time::onTimeClick}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:enabled="true"
-                        android:focusable="false" />
+                        android:focusable="false"
+                        android:onClick="@{listener_time::onTimeClick}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

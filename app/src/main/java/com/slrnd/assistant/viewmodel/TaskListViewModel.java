@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.model.TaskRepository;
@@ -21,7 +22,12 @@ public class TaskListViewModel extends AndroidViewModel {
         super(application);
 
         this.taskRepository = new TaskRepository(application);
-        this.taskLD = taskRepository.getTaskLiveData();
+        //this.taskLD = new MutableLiveData<>(); // taskRepository.findByDate(stringDate); // TODO byDate
+    }
+
+    public void fetch(String stringDate) {
+
+        this.taskLD = this.taskRepository.findByDate(stringDate);
     }
 
     public LiveData<List<Task>> getTaskLiveData() {
@@ -33,11 +39,8 @@ public class TaskListViewModel extends AndroidViewModel {
         task.setIs_done(1);
         this.taskRepository.update(task);
         // reselect after deletion/hide
-        this.taskLD = this.taskRepository.getTaskLiveData();
+        // this.taskLD = this.taskRepository.getTaskLiveData(); ????????????? works fine without 'reselection'
     }
 
-    /*
-    public void update(Task task) {
-        this.taskRepository.update(task);
-    }*/
+
 }

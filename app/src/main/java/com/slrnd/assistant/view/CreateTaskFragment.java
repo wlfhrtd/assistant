@@ -48,9 +48,9 @@ import java.util.concurrent.TimeUnit;
 
 public class CreateTaskFragment extends Fragment implements
         TaskCreateButtonListener,
-        DateClickListener,
+        // DateClickListener,
         TimeClickListener,
-        DatePickerDialog.OnDateSetListener,
+        // DatePickerDialog.OnDateSetListener,
         TimePickerDialog.OnTimeSetListener
 
 {
@@ -92,8 +92,12 @@ public class CreateTaskFragment extends Fragment implements
         this.binding.setTask(new Task("", "", 0));
         this.binding.setCreateButtonListener(this);
         // date and time pickers
-        this.binding.setListenerDate(this);
+        // this.binding.setListenerDate(this);
         this.binding.setListenerTime(this);
+
+        this.year = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedYear();
+        this.month = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedMonth();
+        this.day = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedDayOfMonth();
 
         observeViewModel();
     }
@@ -216,6 +220,7 @@ public class CreateTaskFragment extends Fragment implements
         return running;
     }
 
+    /*
     @Override
     public void onDateClick(View v) {
 
@@ -225,7 +230,7 @@ public class CreateTaskFragment extends Fragment implements
         int l_day = calendar.get(Calendar.DAY_OF_MONTH);
 
         new DatePickerDialog(getActivity(), this, l_year, l_month, l_day).show();
-    }
+    }*/
 
     @Override
     public void onTimeClick(View v) {
@@ -237,6 +242,7 @@ public class CreateTaskFragment extends Fragment implements
         new TimePickerDialog(getActivity(), this, l_hour, l_minute, DateFormat.is24HourFormat(getActivity())).show();
     }
 
+    /*
     @Override
     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
@@ -257,7 +263,7 @@ public class CreateTaskFragment extends Fragment implements
         this.year = year;
         this.month = month;
         this.day = day;
-    }
+    }*/
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {

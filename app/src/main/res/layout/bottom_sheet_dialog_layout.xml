@@ -20,18 +20,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:id="@+id/bottomSheetAdd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="3"
+            app:srcCompat="@drawable/ic_baseline_add_circle_outline_24" />
+
         <TextView
+            android:id="@+id/txtBottomSheetDay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:fontFamily="serif"
             android:padding="24dp"
-            android:textSize="18sp"
-            android:text="Welcome Back. Please Login"
-            android:textColor="@android:color/white" />
+            android:text="Day"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
         <ImageView
-            android:id="@+id/bottom_sheet_arrow"
+            android:id="@+id/bottomSheetArrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -62,68 +71,11 @@
                 android:text="login"
                 android:textSize="36sp" />
 
-            <LinearLayout
+            <CalendarView
+                android:id="@+id/calendarView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
+                android:layout_height="wrap_content" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor= "@color/purple_500"
-                    android:fontFamily="serif"
-                    android:text="username"
-                    android:textSize="24sp" />
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:fontFamily="serif"
-                    android:hint="enter_email_address"
-                    android:inputType="textEmailAddress" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor= "@color/purple_500"
-                    android:fontFamily="serif"
-                    android:text="password"
-                    android:textSize="24sp" />
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:fontFamily="serif"
-                    android:hint="enter_password"
-                    android:inputType="textPassword" />
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="50dp"
-                android:fontFamily="serif"
-                android:text="login"
-                android:backgroundTint="@color/purple_500"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

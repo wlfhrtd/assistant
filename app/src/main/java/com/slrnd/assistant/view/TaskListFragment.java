@@ -1,9 +1,11 @@
 package com.slrnd.assistant.view;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -11,9 +13,11 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,13 +28,22 @@ import com.slrnd.assistant.R;
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class TaskListFragment extends Fragment {
 
     private TaskListViewModel viewModel;
     private TaskListAdapter taskListAdapter;
     private onCheckedChangedListener listener;
+
+    private int selectedYear;
+    private int selectedMonth;
+    private int selectedDayOfMonth;
 
     public TaskListFragment() {
         super();
@@ -62,20 +75,43 @@ public class TaskListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         this.viewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+        /*
+    task.setString_date(
+                String.valueOf(this.year)
+                        + '-'
+                        + this.month
+                        + '-'
+                        + this.day
+        );
+     */
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String stringDate = String.valueOf(year) + '-' + month + '-' + day;
+        this.viewModel.fetch(stringDate);
+
+        Date TODAY = new Date(year - 1900, month, day);
+
+        TextView txtBottomSheetDay = view.findViewById(R.id.txtBottomSheetDay);
+        txtBottomSheetDay.setText(
+                String.valueOf(android.text.format.DateFormat.format("EEEE", calendar.getTime()))
+                + ' '
+                + day
+                + '-'
+                + android.text.format.DateFormat.format("MMMM", calendar.getTime())
+                + '-'
+                + year
+        );
 
         RecyclerView recyclerView = view.findViewById(R.id.recTodoList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(this.taskListAdapter);
 
-        FloatingActionButton fabAdd = view.findViewById(R.id.fabAdd);
-        fabAdd.setOnClickListener(l -> {
-            @NonNull NavDirections action = TaskListFragmentDirections.actionCreateTask();
-            Navigation.findNavController(view).navigate(action);
-        });
         // bottom sheet dialog for calendar view
         LinearLayout bottomSheetLayout = view.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-        ImageView headerArrowImage = view.findViewById(R.id.bottom_sheet_arrow);
+        ImageView headerArrowImage = view.findViewById(R.id.bottomSheetArrow);
         headerArrowImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,19 +123,59 @@ public class TaskListFragment extends Fragment {
                 }
             }
         });
+
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-            }
-
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {}
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
                 headerArrowImage.setRotation(slideOffset * -180);
             }
         });
-        // fetch
+
+        ImageView bottomSheetAdd = view.findViewById(R.id.bottomSheetAdd);
+
+        CalendarView calendarView = view.findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
+                String stringDate = String.valueOf(year) + '-' + month + '-' + dayOfMonth;
+                viewModel.fetch(stringDate);
+                observeViewModel();
+
+                Date selectedDate = new Date(year - 1900, month, dayOfMonth);
+                // args for actionToCreateTask
+                selectedYear = year;
+                selectedMonth = month;
+                selectedDayOfMonth = dayOfMonth;
+
+                txtBottomSheetDay.setText(
+                        String.valueOf(android.text.format.DateFormat.format("EEEE", selectedDate))
+                                + ' '
+                                + dayOfMonth
+                                + '-'
+                                + android.text.format.DateFormat.format("MMMM", selectedDate)
+                                + '-'
+                                + year
+                );
+
+                if (selectedDate.compareTo(TODAY) < 0) {
+
+                    bottomSheetAdd.setVisibility(View.GONE);
+                } else {
+
+                    bottomSheetAdd.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        bottomSheetAdd.setOnClickListener(l -> {
+            @NonNull NavDirections action = TaskListFragmentDirections.actionCreateTask(this.selectedYear, this.selectedMonth, this.selectedDayOfMonth);
+            Navigation.findNavController(view).navigate(action);
+        });
+
+        // update recView
         observeViewModel();
     }
 

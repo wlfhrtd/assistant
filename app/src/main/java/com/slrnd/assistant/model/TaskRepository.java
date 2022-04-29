@@ -17,7 +17,6 @@ public class TaskRepository {
 
         this.taskDao = db.taskDao();
         this.taskLD = this.taskDao.getAllTasks();
-
     }
 
     public void update(Task task) {
@@ -48,4 +47,18 @@ public class TaskRepository {
         return this.taskLD;
     }
 
+    /*
+    task.setString_date(
+                String.valueOf(this.year)
+                        + '-'
+                        + this.month
+                        + '-'
+                        + this.day
+        );
+     */
+
+    public LiveData<List<Task>> findByDate(String stringDate) {
+
+        return taskDao.findByDate(stringDate);
+    }
 }

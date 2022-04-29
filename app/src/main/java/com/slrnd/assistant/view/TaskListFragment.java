@@ -92,6 +92,9 @@ public class TaskListFragment extends Fragment {
         this.viewModel.fetch(stringDate);
 
         Date TODAY = new Date(year - 1900, month, day);
+        this.selectedYear = year;  // TODO update date setting with default fragment behavior (gonna change popBackStack() behavior with returning to chosen date)
+        this.selectedMonth = month;
+        this.selectedDayOfMonth = day;
 
         TextView txtBottomSheetDay = view.findViewById(R.id.txtBottomSheetDay);
         txtBottomSheetDay.setText(

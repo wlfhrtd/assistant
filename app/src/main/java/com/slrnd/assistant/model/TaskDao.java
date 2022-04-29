@@ -29,7 +29,7 @@ public interface TaskDao {
     LiveData<List<Task>> findByDate(String stringDate);
 
     @Delete
-    void deleteTask(Task task); // shouldn't be used anywhere; use hide via is_done flag
+    void delete(Task task);
 
     @Update
     void update(Task task);

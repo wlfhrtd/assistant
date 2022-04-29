@@ -17,7 +17,7 @@ import com.slrnd.assistant.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> implements TaskCheckedChangeListener, TaskEditClickListener {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> implements TaskCheckedChangeListener, TaskDetailsClickListener {
 
     public class TaskListViewHolder extends RecyclerView.ViewHolder {
 
@@ -65,7 +65,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         holder.taskItemLayoutBinding.setTask(this.tasks.get(position));
         holder.taskItemLayoutBinding.setListener(this);
-        holder.taskItemLayoutBinding.setEditListener(this);
+        holder.taskItemLayoutBinding.setDetailsListener(this);
     }
 
     @Override
@@ -83,11 +83,11 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     }
 
     @Override
-    public void onEditClick(View v) {
+    public void onDetailsClick(View v) {
 
         int id = Integer.parseInt(v.getTag().toString());
 
-        TaskListFragmentDirections.ActionEditTaskFragment action = TaskListFragmentDirections.actionEditTaskFragment(id);
+        TaskListFragmentDirections.ActionDetailsTaskFragment action = TaskListFragmentDirections.actionDetailsTaskFragment(id);
         Navigation.findNavController(v).navigate(action);
     }
 }

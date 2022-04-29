@@ -23,72 +23,138 @@
             <TextView
                 android:id="@+id/txtDetailsTaskFragmentTitle"
                 style="@style/TextAppearance.MaterialComponents.Headline3"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
-                android:text="@string/edittask"
+                android:text="@string/txtDetailsTaskFragmentTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <TextView
+                android:id="@+id/txtDetailsTaskDate"
+                style="@style/TextAppearance.MaterialComponents.Headline5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
-                android:hint="@string/entertitle"
-                app:hintAnimationEnabled="true"
-                app:hintEnabled="true"
+                android:text="@{task.string_date}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txtTitleTodo">
+                app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskFragmentTitle" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txtTodoTitle"
+
+
+                <TextView
+                    android:id="@+id/txtDetailsTaskTitle"
+                    style="@style/TextAppearance.MaterialComponents.Headline5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@={task.title}" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:text="@={task.title}"
+                    app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskDate" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout2"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+
+
+                <TextView
+                    android:id="@+id/txtDetailsTaskNote"
+                    style="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:text="@={task.note}"
+                    app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskTitle" />
+
+
+
+                <TextView
+                    android:id="@+id/txtDetailsTaskTime"
+                    style="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:text="Task Time"
+                    app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskNote" />
+
+
+            <ImageView
+                android:id="@+id/imgDetailsTaskDelete"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="24dp"
-                android:hint="@string/enternote"
-                app:hintAnimationEnabled="true"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="48dp"
+                android:src="@drawable/ic_baseline_delete_forever_24"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+                app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskTime" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txtTodoNote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@={task.note}" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <ImageView
+                android:id="@+id/imgDetailsTaskEdit"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="48dp"
+                android:layout_marginEnd="24dp"
+                android:src="@drawable/ic_baseline_edit_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskTime" />
 
-            <Button
-                android:id="@+id/btnTodoCreate"
-                android:layout_width="363dp"
+            <ImageView
+                android:id="@+id/imgDetailsTaskFinish"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="48dp"
+                android:src="@drawable/ic_baseline_done_outline_24"
+                app:layout_constraintEnd_toStartOf="@+id/imgDetailsTaskEdit"
+                app:layout_constraintStart_toEndOf="@+id/imgDetailsTaskDelete"
+                app:layout_constraintTop_toBottomOf="@+id/txtDetailsTaskTime" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="64dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
+                android:gravity="center"
+                android:text="Delete"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgDetailsTaskDelete" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                android:onClick="@{(view) -> saveListener.onTaskSaveChanges(view, task)}"
-                android:text="@string/savechanges"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:gravity="center"
+                android:text="Edit"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/imgDetailsTaskEdit" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Finish"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@+id/textView3"
+                app:layout_constraintStart_toEndOf="@+id/textView2"
+                app:layout_constraintTop_toBottomOf="@+id/imgDetailsTaskFinish" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

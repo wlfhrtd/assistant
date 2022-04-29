@@ -39,7 +39,7 @@ public class TaskRepository {
 
     public void delete(Task task) {
         TaskDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.deleteTask(task);
+            taskDao.delete(task);
         });
     }
 

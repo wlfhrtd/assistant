@@ -20,7 +20,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.CreateTodoFragment">
+        tools:context=".view.CreateTaskFragment">
 
         <ScrollView
             android:layout_width="match_parent"

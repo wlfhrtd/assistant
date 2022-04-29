@@ -12,8 +12,8 @@
             name="listener"
             type="com.slrnd.assistant.view.TaskCheckedChangeListener" />
         <variable
-            name="editListener"
-            type="com.slrnd.assistant.view.TaskEditClickListener" />
+            name="detailsListener"
+            type="com.slrnd.assistant.view.TaskDetailsClickListener" />
 
     </data>
 
@@ -37,15 +37,15 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <ImageView
-            android:id="@+id/imgEdit"
+            android:id="@+id/imgDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="@{detailsListener::onDetailsClick}"
             android:tag="@{task.id}"
-            android:onClick="@{editListener::onEditClick}"
             app:layout_constraintBottom_toBottomOf="@+id/checkTask"
             app:layout_constraintEnd_toEndOf="@+id/checkTask"
             app:layout_constraintTop_toTopOf="@+id/checkTask"
-            app:srcCompat="@drawable/ic_baseline_edit_24" />
+            app:srcCompat="@drawable/ic_baseline_format_list_bulleted_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

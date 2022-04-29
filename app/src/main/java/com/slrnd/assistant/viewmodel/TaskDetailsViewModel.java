@@ -38,4 +38,15 @@ public class TaskDetailsViewModel extends AndroidViewModel {
     public void update(Task task) {
         this.taskRepository.update(task);
     }
+
+    public void finishTask(Task task) {
+
+        task.setIs_done(1);
+        this.taskRepository.update(task);
+    }
+
+    public void deleteTask(Task task) {
+
+        this.taskRepository.delete(task);
+    }
 }

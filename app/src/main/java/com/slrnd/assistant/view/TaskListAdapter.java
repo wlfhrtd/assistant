@@ -17,7 +17,7 @@ import com.slrnd.assistant.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> implements TaskCheckedChangeListener, TaskDetailsClickListener {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> implements TaskDetailsClickListener {
 
     public class TaskListViewHolder extends RecyclerView.ViewHolder {
 
@@ -33,13 +33,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
     private ArrayList<Task> tasks;
 
-    private final TaskListFragment.onCheckedChangedListener mListener;
+    // private final TaskListFragment.onCheckedChangedListener mListener;
 
-    public TaskListAdapter(ArrayList<Task> tasks, TaskListFragment.onCheckedChangedListener listener) {
+    public TaskListAdapter(ArrayList<Task> tasks) { // TaskListFragment.onCheckedChangedListener listener) {
 
         this.tasks = tasks;
 
-        mListener = listener;
+        // mListener = listener;
 
     }
 
@@ -63,9 +63,17 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     @Override
     public void onBindViewHolder(@NonNull TaskListViewHolder holder, int position) {
 
-        holder.taskItemLayoutBinding.setTask(this.tasks.get(position));
-        holder.taskItemLayoutBinding.setListener(this);
+        Task task = this.tasks.get(position);
+        holder.taskItemLayoutBinding.setTask(task);
+        if (task.getIs_done() == 0) {
+            holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_close_24);
+        }
+        if (task.getIs_done() == 1) {
+            holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_done_24);
+        }
+        // holder.taskItemLayoutBinding.setListener(this);
         holder.taskItemLayoutBinding.setDetailsListener(this);
+
     }
 
     @Override
@@ -73,6 +81,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         return this.tasks.size();
     }
 
+    /*
     @Override
     public void onCheckChanged(CompoundButton cb, Boolean isChecked, Task obj) {
 
@@ -80,7 +89,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
             mListener.onCheckedChanged(obj);
         }
-    }
+    }*/
 
     @Override
     public void onDetailsClick(View v) {

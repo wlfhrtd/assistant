@@ -39,7 +39,7 @@ public class TaskListFragment extends Fragment {
 
     private TaskListViewModel viewModel;
     private TaskListAdapter taskListAdapter;
-    private onCheckedChangedListener listener;
+    // private onCheckedChangedListener listener;
 
     private int selectedYear;
     private int selectedMonth;
@@ -48,20 +48,22 @@ public class TaskListFragment extends Fragment {
     public TaskListFragment() {
         super();
 
+        /*
         this.listener = new onCheckedChangedListener() {
             @Override
             public void onCheckedChanged(Task task) {
                 viewModel.clearTask(task);
             }
-        };
+        };*/
 
-        this.taskListAdapter= new TaskListAdapter(new ArrayList<Task>(), listener);
+        this.taskListAdapter= new TaskListAdapter(new ArrayList<Task>()); // , listener);
     }
 
+    /*
     public interface onCheckedChangedListener {
 
         void onCheckedChanged(Task task);
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

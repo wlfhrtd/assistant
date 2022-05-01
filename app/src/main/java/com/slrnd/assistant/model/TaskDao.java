@@ -25,7 +25,7 @@ public interface TaskDao {
     @Query("SELECT * FROM task WHERE id = :id")
     LiveData<Task> selectTask(Integer id);
 
-    @Query("SELECT * FROM task WHERE string_date = :stringDate AND is_done = 0 ORDER BY date ASC")
+    @Query("SELECT * FROM task WHERE string_date = :stringDate ORDER BY is_done ASC, date ASC")
     LiveData<List<Task>> findByDate(String stringDate);
 
     @Delete

@@ -9,9 +9,6 @@
             name="task"
             type="com.slrnd.assistant.model.Task" />
         <variable
-            name="listener"
-            type="com.slrnd.assistant.view.TaskCheckedChangeListener" />
-        <variable
             name="detailsListener"
             type="com.slrnd.assistant.view.TaskDetailsClickListener" />
 
@@ -21,18 +18,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <CheckBox
-            android:id="@+id/checkTask"
+        <TextView
+            android:id="@+id/itemTask"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="32dp"
             android:layout_marginEnd="24dp"
+            android:gravity="center|start"
+            android:minHeight="36dp"
             android:text='@{task.title + " // " + task.string_time}'
-            android:onCheckedChanged="@{(cb, isChecked) -> listener.onCheckChanged(cb, isChecked, task)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/imgIcon"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
@@ -42,10 +40,20 @@
             android:layout_height="wrap_content"
             android:onClick="@{detailsListener::onDetailsClick}"
             android:tag="@{task.id}"
-            app:layout_constraintBottom_toBottomOf="@+id/checkTask"
-            app:layout_constraintEnd_toEndOf="@+id/checkTask"
-            app:layout_constraintTop_toTopOf="@+id/checkTask"
+            app:layout_constraintBottom_toBottomOf="@+id/itemTask"
+            app:layout_constraintEnd_toEndOf="@+id/itemTask"
+            app:layout_constraintTop_toTopOf="@+id/itemTask"
             app:srcCompat="@drawable/ic_baseline_format_list_bulleted_24" />
+
+        <ImageView
+            android:id="@+id/imgIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/itemTask"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/itemTask"
+            app:srcCompat="@drawable/ic_baseline_close_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

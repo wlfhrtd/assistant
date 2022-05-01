@@ -42,34 +42,42 @@ public class DetailsTaskFragment extends Fragment {
 
         observeViewModel();
 
-        // TODO listeners
-        // DELETE
-        ImageView imgDetailsTaskDelete = view.findViewById(R.id.imgDetailsTaskDelete);
-        imgDetailsTaskDelete.setOnClickListener(view13 -> {
-            // TODO mess with workManager cancel
-            viewModel.deleteTask(binding.getTask());
+        int isDone = DetailsTaskFragmentArgs.fromBundle(requireArguments()).getIsDone();
+        if (isDone == 0) {
 
-            Toast.makeText(this.getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+            View doneBar = view.findViewById(R.id.done_bar);
+            doneBar.setVisibility(View.GONE);
 
-            Navigation.findNavController(view13).popBackStack();
-        });
-        // EDIT
-        ImageView imgDetailsTaskEdit = view.findViewById(R.id.imgDetailsTaskEdit);
-        imgDetailsTaskEdit.setOnClickListener(view1 -> {
-            // TODO mess with workManager cancel+enqueue_new or possible update_current
-            DetailsTaskFragmentDirections.ActionEditTaskFragment action = DetailsTaskFragmentDirections.actionEditTaskFragment(id);
-            Navigation.findNavController(view1).navigate(action);
-        });
-        // FINISH
-        ImageView imgDetailsTaskFinish = view.findViewById(R.id.imgDetailsTaskFinish);
-        imgDetailsTaskFinish.setOnClickListener(view12 -> {
-            // TODO remove checkboxes and onChecked listener
-            viewModel.finishTask(binding.getTask());
+            View detailsFragmentTaskActions = view.findViewById(R.id.details_fragment_task_actions);
+            detailsFragmentTaskActions.setVisibility(View.VISIBLE);
+            // DELETE
+            ImageView imgDetailsTaskDelete = view.findViewById(R.id.imgDetailsTaskDelete);
+            imgDetailsTaskDelete.setOnClickListener(view13 -> {
+                // TODO mess with workManager cancel
+                viewModel.deleteTask(binding.getTask());
 
-            Toast.makeText(this.getContext(), "Task finished", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
 
-            Navigation.findNavController(view12).popBackStack();
-        });
+                Navigation.findNavController(view13).popBackStack();
+            });
+            // EDIT
+            ImageView imgDetailsTaskEdit = view.findViewById(R.id.imgDetailsTaskEdit);
+            imgDetailsTaskEdit.setOnClickListener(view1 -> {
+                // TODO mess with workManager cancel+enqueue_new or possible update_current
+                DetailsTaskFragmentDirections.ActionEditTaskFragment action = DetailsTaskFragmentDirections.actionEditTaskFragment(id);
+                Navigation.findNavController(view1).navigate(action);
+            });
+            // FINISH
+            ImageView imgDetailsTaskFinish = view.findViewById(R.id.imgDetailsTaskFinish);
+            imgDetailsTaskFinish.setOnClickListener(view12 -> {
+                // TODO remove checkboxes and onChecked listener
+                viewModel.finishTask(binding.getTask());
+
+                Toast.makeText(this.getContext(), "Task finished", Toast.LENGTH_SHORT).show();
+
+                Navigation.findNavController(view12).popBackStack();
+            });
+        }
     }
 
     private void observeViewModel() {

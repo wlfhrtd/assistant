@@ -96,7 +96,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         int id = Integer.parseInt(v.getTag().toString());
 
-        TaskListFragmentDirections.ActionDetailsTaskFragment action = TaskListFragmentDirections.actionDetailsTaskFragment(id);
+        int isDone = Integer.parseInt(v.getRootView().findViewById(R.id.imgIcon).getTag().toString());
+
+        TaskListFragmentDirections.ActionDetailsTaskFragment action = TaskListFragmentDirections.actionDetailsTaskFragment(id, isDone);
         Navigation.findNavController(v).navigate(action);
     }
 }

@@ -51,5 +51,8 @@
         <argument
             android:name="id"
             app:argType="integer" />
+        <argument
+            android:name="isDone"
+            app:argType="integer" />
     </fragment>
 </navigation>

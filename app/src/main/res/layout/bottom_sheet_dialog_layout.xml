@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="serif"
                 android:gravity="center_horizontal"
-                android:text="login"
+                android:text="Choose date"
                 android:textSize="36sp" />
 
             <CalendarView

@@ -1,6 +1,5 @@
 package com.slrnd.assistant.view;
 
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.work.Data;
@@ -23,7 +21,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -32,11 +29,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentCreateTaskBinding;
 import com.slrnd.assistant.model.Task;
-import com.slrnd.assistant.model.TaskRepository;
 import com.slrnd.assistant.util.TaskWorker;
 import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
-import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,7 +132,7 @@ public class CreateTaskFragment extends Fragment implements
         );
 
         if (this.tasks != null) {
-            Log.d("SHIT", "ALLTASKS NOT NULL");
+            Log.d("OK", "ALLTASKS NOT NULL");
             for (int i = 0; i < this.tasks.size(); i++) {
                 if (this.tasks.get(i).getString_date().equals(task.getString_date()) && this.tasks.get(i).getString_time().equals(task.getString_time())) {
                     Log.d(task.getString_date(), "CATCH!");
@@ -153,9 +148,6 @@ public class CreateTaskFragment extends Fragment implements
 
         // saving task date to task obj
         task.setDate(calendar.getTimeInMillis() / 1000L);
-        // loading new task obj to LD; list for no reason w/e
-        List<Task> tasks = Arrays.asList(task);
-        this.viewModel.addTask(tasks);
 
         // immediate notif
         // new NotificationHelper(this.getContext()).createNotification("Task Created", "The new task has been created");
@@ -174,6 +166,10 @@ public class CreateTaskFragment extends Fragment implements
             Log.d(uniqueWorkName, "CATCH");
             Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
         }
+
+        // loading new task obj to LD; list for no reason w/e
+        List<Task> tasks = Arrays.asList(task);
+        this.viewModel.addTask(tasks);
 
         Navigation.findNavController(v).popBackStack();
     }

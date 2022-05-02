@@ -7,6 +7,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentDetailsTaskBinding;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
+
+import java.util.List;
 
 public class DetailsTaskFragment extends Fragment {
 
@@ -50,11 +55,15 @@ public class DetailsTaskFragment extends Fragment {
 
             View detailsFragmentTaskActions = view.findViewById(R.id.details_fragment_task_actions);
             detailsFragmentTaskActions.setVisibility(View.VISIBLE);
+
+            WorkManager workManager = WorkManager.getInstance(requireContext());
             // DELETE
             ImageView imgDetailsTaskDelete = view.findViewById(R.id.imgDetailsTaskDelete);
             imgDetailsTaskDelete.setOnClickListener(view13 -> {
-                // TODO mess with workManager cancel
+
                 viewModel.deleteTask(binding.getTask());
+
+                workManager.cancelUniqueWork(String.valueOf(binding.getTask().getDate()));
 
                 Toast.makeText(this.getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
 
@@ -70,8 +79,10 @@ public class DetailsTaskFragment extends Fragment {
             // FINISH
             ImageView imgDetailsTaskFinish = view.findViewById(R.id.imgDetailsTaskFinish);
             imgDetailsTaskFinish.setOnClickListener(view12 -> {
-                // TODO remove checkboxes and onChecked listener
+
                 viewModel.finishTask(binding.getTask());
+                // if finished IRL before triggering work and work is no longer needed
+                workManager.cancelUniqueWork(String.valueOf(binding.getTask().getDate()));
 
                 Toast.makeText(this.getContext(), "Task finished", Toast.LENGTH_SHORT).show();
 

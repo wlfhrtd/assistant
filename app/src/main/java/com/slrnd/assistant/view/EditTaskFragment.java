@@ -26,11 +26,9 @@ public class EditTaskFragment extends Fragment implements TaskSaveChangesListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        // since we use same layout as fragment_create_todo we change it here from fragment_edit_todo & just delete fragment_edit_todo.xml from project
-        // return inflater.inflate(R.layout.fragment_create_todo, container, false);
 
         this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_task, container, false);
+
         return this.binding.getRoot();
     }
 
@@ -51,14 +49,7 @@ public class EditTaskFragment extends Fragment implements TaskSaveChangesListene
 
     private void observeViewModel() {
 
-        this.viewModel.todoLD.observe(getViewLifecycleOwner(), new Observer<Task>() {
-            @Override
-            public void onChanged(Task task) {
-
-                binding.setTask(task);
-            }
-
-        });
+        this.viewModel.todoLD.observe(getViewLifecycleOwner(), task -> binding.setTask(task));
     }
 
     @Override

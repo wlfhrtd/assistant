@@ -157,29 +157,30 @@ public class CreateTaskFragment extends Fragment implements
         List<Task> tasks = Arrays.asList(task);
         this.viewModel.addTask(tasks);
 
-        Toast.makeText(this.getContext(), "Task created", Toast.LENGTH_SHORT).show();
         // immediate notif
         // new NotificationHelper(this.getContext()).createNotification("Task Created", "The new task has been created");
 
-
-
         // WorkManager.getInstance(requireContext()).enqueue(myWorkRequest); // uniqueness issue
 
-        WorkManager workManager = WorkManager.getInstance(requireContext());
         // checking for existing/duplication; used task.date as uuid
-        String id = String.valueOf(task.getDate());
+        String uniqueWorkName = String.valueOf(task.getDate());
 
-        if (!isWorkScheduled(id, getContext())) {
-            scheduleWork(id, diff, workManager);
+        if (!isWorkScheduled(uniqueWorkName, getContext())) {
+
+            scheduleWork(uniqueWorkName, diff);
+
+            Toast.makeText(this.getContext(), "Task created", Toast.LENGTH_SHORT).show();
         } else {
-            Log.d(id, "CATCH");
+            Log.d(uniqueWorkName, "CATCH");
             Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
         }
 
         Navigation.findNavController(v).popBackStack();
     }
 
-    public void scheduleWork(String id, long diff, WorkManager workManager) {
+    public void scheduleWork(String uniqueWorkName, long diff) {
+
+        WorkManager workManager = WorkManager.getInstance(requireContext());
 
         OneTimeWorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(TaskWorker.class)
                 .setInitialDelay(diff, TimeUnit.SECONDS)
@@ -190,16 +191,16 @@ public class CreateTaskFragment extends Fragment implements
                 .build();
 
         workManager.enqueueUniqueWork(
-                id,
+                uniqueWorkName,
                 ExistingWorkPolicy.KEEP,
                 myWorkRequest);
     }
 
-    private boolean isWorkScheduled(String id, Context context) {
+    private boolean isWorkScheduled(String uniqueWorkName, Context context) {
 
         WorkManager workManager = WorkManager.getInstance(context);
 
-        ListenableFuture<List<WorkInfo>> statuses = workManager.getWorkInfosForUniqueWork(id);
+        ListenableFuture<List<WorkInfo>> statuses = workManager.getWorkInfosForUniqueWork(uniqueWorkName);
 
         boolean running = false;
         List<WorkInfo> workInfoList = Collections.emptyList();
@@ -207,9 +208,9 @@ public class CreateTaskFragment extends Fragment implements
         try {
             workInfoList = statuses.get();
         } catch (ExecutionException e) {
-            Log.d(id, "ExecutionException in isWorkScheduled: " + e);
+            Log.d(uniqueWorkName, "ExecutionException in isWorkScheduled: " + e);
         } catch (InterruptedException e) {
-            Log.d(id, "InterruptedException in isWorkScheduled: " + e);
+            Log.d(uniqueWorkName, "InterruptedException in isWorkScheduled: " + e);
         }
 
         for (WorkInfo workInfo : workInfoList) {

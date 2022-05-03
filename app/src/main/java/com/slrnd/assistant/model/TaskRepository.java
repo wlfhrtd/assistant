@@ -9,14 +9,14 @@ import java.util.List;
 public class TaskRepository {
 
     private TaskDao taskDao;
-    private LiveData<List<Task>> taskLD;
+    // private LiveData<List<Task>> taskLD;
 
     public TaskRepository(Application application) {
 
         TaskDatabase db = TaskDatabase.getDatabase(application);
 
         this.taskDao = db.taskDao();
-        this.taskLD = this.taskDao.getAllTasks();
+        // this.taskLD = this.taskDao.getAllTasks();
     }
 
     public void update(Task task) {
@@ -43,9 +43,10 @@ public class TaskRepository {
         });
     }
 
+    /*
     public LiveData<List<Task>> getTaskLiveData() {
         return this.taskLD;
-    }
+    }*/
 
     /*
     task.setString_date(

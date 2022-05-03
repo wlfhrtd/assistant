@@ -46,6 +46,7 @@ public class TaskListFragment extends Fragment {
     private int selectedDayOfMonth;
 
     public TaskListFragment() {
+
         super();
 
         /*
@@ -68,12 +69,13 @@ public class TaskListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_task_list, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
 
         this.viewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
@@ -90,6 +92,7 @@ public class TaskListFragment extends Fragment {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
+
         String stringDate = String.valueOf(year) + '-' + month + '-' + day;
         this.viewModel.fetch(stringDate);
 
@@ -117,15 +120,13 @@ public class TaskListFragment extends Fragment {
         LinearLayout bottomSheetLayout = view.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
         ImageView headerArrowImage = view.findViewById(R.id.bottomSheetArrow);
-        headerArrowImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        headerArrowImage.setOnClickListener(view1 -> {
 
-                if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
+            if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            } else {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
 
@@ -176,19 +177,22 @@ public class TaskListFragment extends Fragment {
         });
 
         bottomSheetAdd.setOnClickListener(l -> {
-            @NonNull NavDirections action = TaskListFragmentDirections.actionCreateTask(this.selectedYear, this.selectedMonth, this.selectedDayOfMonth);
+
+            NavDirections action = TaskListFragmentDirections.actionCreateTask(this.selectedYear, this.selectedMonth, this.selectedDayOfMonth);
             Navigation.findNavController(view).navigate(action);
         });
 
-        // update recView
         observeViewModel();
     }
 
     private void observeViewModel() {
-        this.viewModel.taskLD.observe(getViewLifecycleOwner(), list -> {
+        this.viewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
+
             this.taskListAdapter.updateTaskList(list);
+
             TextView txtEmpty = requireView().findViewById(R.id.txtEmpty);
             if (list.isEmpty()) {
+
                 txtEmpty.setVisibility(View.VISIBLE);
             } else {
                 txtEmpty.setVisibility(View.GONE);

@@ -15,14 +15,13 @@ import java.util.List;
 public class TaskListViewModel extends AndroidViewModel {
 
     private TaskRepository taskRepository;
-    public LiveData<List<Task>> taskLD;
+    private LiveData<List<Task>> taskLD;
 
     public TaskListViewModel(@NonNull Application application) {
 
         super(application);
 
         this.taskRepository = new TaskRepository(application);
-        //this.taskLD = new MutableLiveData<>(); // taskRepository.findByDate(stringDate); // TODO byDate
     }
 
     public void fetch(String stringDate) {
@@ -38,9 +37,5 @@ public class TaskListViewModel extends AndroidViewModel {
 
         task.setIs_done(1);
         this.taskRepository.update(task);
-        // reselect after deletion/hide
-        // this.taskLD = this.taskRepository.getTaskLiveData(); ????????????? works fine without 'reselection'
     }
-
-
 }

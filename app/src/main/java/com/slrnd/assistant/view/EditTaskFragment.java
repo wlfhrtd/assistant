@@ -7,6 +7,10 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import android.text.format.DateFormat;
@@ -20,10 +24,12 @@ import android.widget.Toast;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentEditTaskBinding;
 import com.slrnd.assistant.model.Task;
+import com.slrnd.assistant.util.TaskWorker;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class EditTaskFragment extends Fragment implements
         TaskSaveChangesListener,
@@ -35,9 +41,6 @@ public class EditTaskFragment extends Fragment implements
     private TaskDetailsViewModel viewModel;
     private FragmentEditTaskBinding binding;
 
-    private int year = 0;
-    private int month = 0;
-    private int day = 0;
     private int hour = 0;
     private int minute = 0;
 
@@ -74,26 +77,19 @@ public class EditTaskFragment extends Fragment implements
 
             TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
             txtTime.setText(task.getString_time());
-
-            /*
-            Date date = new Date(task.getDate());
-            this.year = date.getYear();
-            this.month = date.getMonth();
-            this.day = date.getDay();
-            this.hour = date.getHours();
-            this.minute = date.getMinutes();*/
         });
     }
 
     @Override
     public void onTaskSaveChanges(View v, Task obj) {
-        // TODO work manager!!!
-        // WorkManager workManager = WorkManager.getInstance(requireContext());
-        // workManager.cancelUniqueWork(String.valueOf(obj.getDate()));
 
-        // implement time setting logic as in Create, get working db update action; then mess with workmanager
+        Date date = new Date(obj.getDate());
+        int year = date.getYear();
+        int month = date.getMonth();
+        int day = date.getDay();
+        // y,m,d from task obj; h,m from time picker onTimeSet()
         Calendar calendar = Calendar.getInstance();
-        calendar.set(this.year, this.month, this.day, this.hour, this.minute);
+        calendar.set(year, month, day, this.hour, this.minute);
 
         obj.setString_time(
                 String.valueOf(this.hour)
@@ -101,9 +97,45 @@ public class EditTaskFragment extends Fragment implements
                         + this.minute
         );
 
+        // TODO duplication check, update viewmodel first (by day limitation) and look on CreateTask
+
+        // cancel old work
+        WorkManager workManager = WorkManager.getInstance(requireContext());
+        workManager.cancelUniqueWork(String.valueOf(obj.getDate()));
+
+        // saving new date
+        obj.setDate(calendar.getTimeInMillis() / 1000L);
+
+        Calendar today = Calendar.getInstance();
+        // diff for work manager delay
+        long diff = (calendar.getTimeInMillis() / 1000L) - (today.getTimeInMillis() / 1000L);
+        // enqueue new work for updated task
+        String uniqueWorkName = String.valueOf(obj.getDate());
+        scheduleWork(uniqueWorkName, diff);
+
         this.viewModel.update(obj); // only title&note updated thx to 2sided @={} databinding
 
         Toast.makeText(v.getContext(), "Task Updated", Toast.LENGTH_SHORT).show();
+
+        Navigation.findNavController(v).popBackStack();
+    }
+
+    public void scheduleWork(String uniqueWorkName, long diff) {
+
+        WorkManager workManager = WorkManager.getInstance(requireContext());
+
+        OneTimeWorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(TaskWorker.class)
+                .setInitialDelay(diff, TimeUnit.SECONDS)
+                .setInputData(new Data.Builder()
+                        .putString("title", "Edited task: " + this.binding.getTask().getTitle())
+                        .putString("message", "The task has been updated: " + this.binding.getTask().getNote())
+                        .build())
+                .build();
+
+        workManager.enqueueUniqueWork(
+                uniqueWorkName,
+                ExistingWorkPolicy.KEEP,
+                myWorkRequest);
     }
 
     @Override

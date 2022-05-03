@@ -65,8 +65,6 @@ public class CreateTaskFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        // return inflater.inflate(R.layout.fragment_create_todo, container, false);
 
         this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_create_task, container, false);
 
@@ -80,9 +78,15 @@ public class CreateTaskFragment extends Fragment implements
 
         super.onViewCreated(view, savedInstanceState);
 
+        this.year = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedYear();
+        this.month = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedMonth();
+        this.day = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedDayOfMonth();
+
         this.viewModel = new ViewModelProvider(this).get(TaskDetailsViewModel.class);
 
         this.taskCreateViewModel = new ViewModelProvider(this).get(TaskCreateViewModel.class);
+        String stringDate = String.valueOf(this.year) + '-' + this.month + '-' + this.day;
+        this.taskCreateViewModel.fetch(stringDate);
 
         this.binding.setTask(new Task("", "", 0));
         this.binding.setCreateButtonListener(this);
@@ -90,15 +94,13 @@ public class CreateTaskFragment extends Fragment implements
         // this.binding.setListenerDate(this);
         this.binding.setListenerTime(this);
 
-        this.year = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedYear();
-        this.month = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedMonth();
-        this.day = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedDayOfMonth();
+
 
         observeViewModel();
     }
 
     private void observeViewModel() {
-        this.taskCreateViewModel.taskLD.observe(getViewLifecycleOwner(), list -> {
+        this.taskCreateViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
 
             this.updateTaskList(list);
         });
@@ -125,16 +127,18 @@ public class CreateTaskFragment extends Fragment implements
                         + '-'
                         + this.day
         );
+
         task.setString_time(
                 String.valueOf(this.hour)
                         + '-'
                         + this.minute
         );
 
+        // duplication check
         if (this.tasks != null) {
             Log.d("OK", "ALLTASKS NOT NULL");
             for (int i = 0; i < this.tasks.size(); i++) {
-                if (this.tasks.get(i).getString_date().equals(task.getString_date()) && this.tasks.get(i).getString_time().equals(task.getString_time())) {
+                if (this.tasks.get(i).getString_time().equals(task.getString_time())) {
                     Log.d(task.getString_date(), "CATCH!");
                     Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
                     return;

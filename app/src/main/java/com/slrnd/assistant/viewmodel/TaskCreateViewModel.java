@@ -14,18 +14,22 @@ import java.util.List;
 public class TaskCreateViewModel extends AndroidViewModel {
 
     private TaskRepository taskRepository;
-    public LiveData<List<Task>> taskLD;
+    private LiveData<List<Task>> taskLD;
 
     public TaskCreateViewModel(@NonNull Application application) {
 
         super(application);
 
         this.taskRepository = new TaskRepository(application);
-        this.taskLD = this.taskRepository.getTaskLiveData();
+        // this.taskLD = this.taskRepository.getTaskLiveData();
+    }
+
+    public void fetch(String stringDate) {
+
+        this.taskLD = this.taskRepository.findByDate(stringDate);
     }
 
     public LiveData<List<Task>> getTaskLiveData() {
         return this.taskLD;
     }
-
 }

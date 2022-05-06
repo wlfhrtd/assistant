@@ -149,7 +149,7 @@ public class CreateTaskFragment extends Fragment implements
         long diff = (calendar.getTimeInMillis() / 1000L) - (today.getTimeInMillis() / 1000L);
 
         // saving task date to task obj
-        task.setDate(calendar.getTimeInMillis() / 1000L);
+        task.setDatetime(calendar.getTimeInMillis() / 1000L);
 
         // immediate notif
         // new NotificationHelper(this.getContext()).createNotification("Task Created", "The new task has been created");
@@ -157,7 +157,7 @@ public class CreateTaskFragment extends Fragment implements
         // WorkManager.getInstance(requireContext()).enqueue(myWorkRequest); // uniqueness issue
 
         // checking for existing/duplication; used task.date as uuid
-        String uniqueWorkName = String.valueOf(task.getDate());
+        String uniqueWorkName = String.valueOf(task.getDatetime());
 
         scheduleWork(uniqueWorkName, diff);
 

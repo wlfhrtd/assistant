@@ -16,20 +16,20 @@ public class Task {
     private String note;
     @ColumnInfo(name = "is_done")
     private int is_done;
-    @ColumnInfo(name = "date")
-    private long date;
+    @ColumnInfo(name = "datetime")
+    private long datetime;
 
     @ColumnInfo(name = "string_date")
     private String string_date;
     @ColumnInfo(name = "string_time")
     private String string_time;
 
-    public Task(String title, String note, long date) {
+    public Task(String title, String note, long datetime) {
 
         this.title = title;
         this.note = note;
         this.is_done = 0;
-        this.date = date;
+        this.datetime = datetime;
     }
 
     public Integer getId() {
@@ -64,12 +64,12 @@ public class Task {
         this.is_done = is_done;
     }
 
-    public long getDate() {
-        return date;
+    public long getDatetime() {
+        return datetime;
     }
 
-    public void setDate(long date) {
-        this.date = date;
+    public void setDatetime(long datetime) {
+        this.datetime = datetime;
     }
 
     public String getString_date() {

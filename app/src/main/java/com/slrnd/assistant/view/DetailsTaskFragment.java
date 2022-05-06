@@ -60,7 +60,7 @@ public class DetailsTaskFragment extends Fragment {
 
                 viewModel.deleteTask(binding.getTask());
 
-                workManager.cancelUniqueWork(String.valueOf(binding.getTask().getDate()));
+                workManager.cancelUniqueWork(String.valueOf(binding.getTask().getDatetime()));
 
                 Toast.makeText(this.getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
 
@@ -80,7 +80,7 @@ public class DetailsTaskFragment extends Fragment {
 
                 viewModel.finishTask(binding.getTask());
                 // if finished IRL before triggering work and work is no longer needed
-                workManager.cancelUniqueWork(String.valueOf(binding.getTask().getDate()));
+                workManager.cancelUniqueWork(String.valueOf(binding.getTask().getDatetime()));
 
                 Toast.makeText(this.getContext(), "Task finished", Toast.LENGTH_SHORT).show();
 

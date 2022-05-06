@@ -30,9 +30,6 @@ import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -100,7 +97,7 @@ public class EditTaskFragment extends Fragment implements
 
             String stringDate = task.getString_date();
             String stringTime = task.getString_time();
-            long timestamp = task.getDate() * 1000L;
+            long timestamp = task.getDatetime() * 1000L;
             SimpleDateFormat df = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
             String formatted = df.format(timestamp);
 
@@ -145,7 +142,7 @@ public class EditTaskFragment extends Fragment implements
     @Override
     public void onTaskSaveChanges(View v, Task obj) {
 
-        Date date = new Date(obj.getDate());
+        Date date = new Date(obj.getDatetime());
         int year = date.getYear();
         int month = date.getMonth();
         int day = date.getDay();
@@ -173,16 +170,16 @@ public class EditTaskFragment extends Fragment implements
 
         // cancel old work
         WorkManager workManager = WorkManager.getInstance(requireContext());
-        workManager.cancelUniqueWork(String.valueOf(obj.getDate()));
+        workManager.cancelUniqueWork(String.valueOf(obj.getDatetime()));
 
         // saving new date
-        obj.setDate(calendar.getTimeInMillis() / 1000L);
+        obj.setDatetime(calendar.getTimeInMillis() / 1000L);
 
         Calendar today = Calendar.getInstance();
         // diff for work manager delay
         long diff = (calendar.getTimeInMillis() / 1000L) - (today.getTimeInMillis() / 1000L);
         // enqueue new work for updated task
-        String uniqueWorkName = String.valueOf(obj.getDate());
+        String uniqueWorkName = String.valueOf(obj.getDatetime());
         scheduleWork(uniqueWorkName, diff);
 
         this.viewModel.update(obj); // only title&note updated thx to 2sided @={} databinding

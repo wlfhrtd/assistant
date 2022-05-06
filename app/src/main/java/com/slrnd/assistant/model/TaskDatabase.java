@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 @Database(entities = {Task.class}, version = 3, exportSchema = false)
 public abstract class TaskDatabase extends RoomDatabase {
 
-    private static String DB_NAME = "task_database";
+    private static String DB_NAME = "task_db";
 
     private static Migration MIGRATION_1_2 = new Migration(1,2) {
         @Override

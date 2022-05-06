@@ -270,7 +270,7 @@ public class CreateTaskFragment extends Fragment implements
         String formatted_minute_string = String.format("%2s", minute_string).replace(' ', '0');
         // HH:MM
         // 08:05
-        txtTime.setText(formatted_hour_string + ':' + formatted_minute_string);
+        txtTime.setText(formatted_hour_string + '-' + formatted_minute_string);
 
         this.hour = hourOfDay;
         this.minute = minute;

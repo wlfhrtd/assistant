@@ -29,6 +29,10 @@ import com.slrnd.assistant.util.TaskWorker;
 import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +53,8 @@ public class EditTaskFragment extends Fragment implements
     private ArrayList<Task> tasks;
 
     // add originalHM to check if changed and do checks if yes
+    private int originalHour = 0;
+    private int originalMinute = 0;
     private int hour = 0;
     private int minute = 0;
 
@@ -91,6 +97,32 @@ public class EditTaskFragment extends Fragment implements
         this.viewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> {
 
             binding.setTask(task);
+
+            String stringDate = task.getString_date();
+            String stringTime = task.getString_time();
+            long timestamp = task.getDate() * 1000L;
+            SimpleDateFormat df = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
+            String formatted = df.format(timestamp);
+
+            String d = new SimpleDateFormat("dd").format(timestamp);
+            String m = new SimpleDateFormat("MM").format(timestamp);
+            String y = new SimpleDateFormat("yyyy").format(timestamp);
+            String h = new SimpleDateFormat("HH").format(timestamp);
+            String mm = new SimpleDateFormat("mm").format(timestamp);
+            String s = new SimpleDateFormat("ss").format(timestamp);
+
+            int test = Integer.parseInt(y);
+
+            Log.d("DD", stringDate);
+            Log.d("DD", stringTime);
+            Log.d("DD", formatted);
+            Log.d("DD", d);
+            Log.d("DD", m);
+            Log.d("DD", y);
+            Log.d("DD", h);
+            Log.d("DD", mm);
+            Log.d("DD", s);
+            Log.d("DD", String.valueOf(test));
 
             TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
             txtTime.setText(task.getString_time());
@@ -190,7 +222,7 @@ public class EditTaskFragment extends Fragment implements
         String formatted_minute_string = String.format("%2s", minute_string).replace(' ', '0');
         // HH:MM
         // 08:05
-        txtTime.setText(formatted_hour_string + ':' + formatted_minute_string);
+        txtTime.setText(formatted_hour_string + '-' + formatted_minute_string);
 
         this.hour = hourOfDay;
         this.minute = minute;

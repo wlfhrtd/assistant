@@ -15,19 +15,19 @@ import java.util.List;
 public class TaskDetailsViewModel extends AndroidViewModel {
 
     private TaskRepository taskRepository;
-    public LiveData<Task> todoLD;
+    private LiveData<Task> taskLD;
 
     public TaskDetailsViewModel(@NonNull Application application) {
 
         super(application);
 
         this.taskRepository = new TaskRepository(application);
-        this.todoLD = new MutableLiveData<>();
+        this.taskLD = new MutableLiveData<>();
     }
 
     public void fetch(int id) {
 
-        this.todoLD = this.taskRepository.findOneById(id);
+        this.taskLD = this.taskRepository.findOneById(id);
     }
 
     public void addTask(List<Task> list) {
@@ -48,5 +48,9 @@ public class TaskDetailsViewModel extends AndroidViewModel {
     public void deleteTask(Task task) {
 
         this.taskRepository.delete(task);
+    }
+
+    public LiveData<Task> getTaskLiveData() {
+        return this.taskLD;
     }
 }

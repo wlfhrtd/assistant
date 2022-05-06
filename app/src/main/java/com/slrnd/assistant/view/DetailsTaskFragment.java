@@ -7,7 +7,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.view.LayoutInflater;
@@ -16,12 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentDetailsTaskBinding;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
-
-import java.util.List;
 
 public class DetailsTaskFragment extends Fragment {
 
@@ -32,6 +28,7 @@ public class DetailsTaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_details_task, container, false);
+
         return this.binding.getRoot();
     }
 
@@ -72,8 +69,9 @@ public class DetailsTaskFragment extends Fragment {
             // EDIT
             ImageView imgDetailsTaskEdit = view.findViewById(R.id.imgDetailsTaskEdit);
             imgDetailsTaskEdit.setOnClickListener(view1 -> {
-                // TODO mess with workManager cancel+enqueue_new or possible update_current
-                DetailsTaskFragmentDirections.ActionEditTaskFragment action = DetailsTaskFragmentDirections.actionEditTaskFragment(id);
+
+                String stringDate = binding.getTask().getString_date();
+                DetailsTaskFragmentDirections.ActionEditTaskFragment action = DetailsTaskFragmentDirections.actionEditTaskFragment(id, stringDate);
                 Navigation.findNavController(view1).navigate(action);
             });
             // FINISH
@@ -93,6 +91,6 @@ public class DetailsTaskFragment extends Fragment {
 
     private void observeViewModel() {
 
-        this.viewModel.todoLD.observe(getViewLifecycleOwner(), task -> binding.setTask(task));
+        this.viewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> binding.setTask(task));
     }
 }

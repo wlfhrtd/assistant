@@ -14,6 +14,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,13 @@ import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentEditTaskBinding;
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.util.TaskWorker;
+import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
 import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EditTaskFragment extends Fragment implements
@@ -41,6 +45,10 @@ public class EditTaskFragment extends Fragment implements
     private TaskDetailsViewModel viewModel;
     private FragmentEditTaskBinding binding;
 
+    private TaskCreateViewModel taskCreateViewModel;
+    private ArrayList<Task> tasks;
+
+    // add originalHM to check if changed and do checks if yes
     private int hour = 0;
     private int minute = 0;
 
@@ -49,6 +57,8 @@ public class EditTaskFragment extends Fragment implements
                              Bundle savedInstanceState) {
 
         this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_task, container, false);
+
+        this.tasks = new ArrayList<Task>();
 
         return this.binding.getRoot();
     }
@@ -63,21 +73,41 @@ public class EditTaskFragment extends Fragment implements
         int id = EditTaskFragmentArgs.fromBundle(requireArguments()).getId();
         this.viewModel.fetch(id);
 
+        this.taskCreateViewModel = new ViewModelProvider(this).get(TaskCreateViewModel.class);
+        // yyyy-mm-dd
+        String stringDate = EditTaskFragmentArgs.fromBundle(requireArguments()).getStringDate();
+        this.taskCreateViewModel.fetch(stringDate);
+
         this.binding.setSaveListener(this);
         this.binding.setListenerTime(this);
 
         observeViewModel();
+
+        observeTaskCreateViewModel();
     }
 
     private void observeViewModel() {
 
-        this.viewModel.todoLD.observe(getViewLifecycleOwner(), task -> {
+        this.viewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> {
 
             binding.setTask(task);
 
             TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
             txtTime.setText(task.getString_time());
         });
+    }
+
+    private void observeTaskCreateViewModel() {
+        this.taskCreateViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
+
+            this.updateTaskList(list);
+        });
+    }
+
+    public void updateTaskList(List<Task> newTasks) {
+
+        this.tasks.clear();
+        this.tasks.addAll(newTasks);
     }
 
     @Override
@@ -97,7 +127,17 @@ public class EditTaskFragment extends Fragment implements
                         + this.minute
         );
 
-        // TODO duplication check, update viewmodel first (by day limitation) and look on CreateTask
+        // duplication check
+        if (this.tasks != null) {
+            Log.d("OK", "ALLTASKS NOT NULL");
+            for (int i = 0; i < this.tasks.size(); i++) {
+                if (this.tasks.get(i).getString_time().equals(obj.getString_time())) {
+                    Log.d(obj.getString_date(), "CATCH!");
+                    Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
 
         // cancel old work
         WorkManager workManager = WorkManager.getInstance(requireContext());

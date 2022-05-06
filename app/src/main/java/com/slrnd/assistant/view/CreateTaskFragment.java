@@ -94,8 +94,6 @@ public class CreateTaskFragment extends Fragment implements
         // this.binding.setListenerDate(this);
         this.binding.setListenerTime(this);
 
-
-
         observeViewModel();
     }
 
@@ -161,15 +159,9 @@ public class CreateTaskFragment extends Fragment implements
         // checking for existing/duplication; used task.date as uuid
         String uniqueWorkName = String.valueOf(task.getDate());
 
-        if (!isWorkScheduled(uniqueWorkName, getContext())) {
+        scheduleWork(uniqueWorkName, diff);
 
-            scheduleWork(uniqueWorkName, diff);
-
-            Toast.makeText(this.getContext(), "Task created", Toast.LENGTH_SHORT).show();
-        } else {
-            Log.d(uniqueWorkName, "CATCH");
-            Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
-        }
+        Toast.makeText(this.getContext(), "Task created", Toast.LENGTH_SHORT).show();
 
         // loading new task obj to LD; list for no reason w/e
         List<Task> tasks = Arrays.asList(task);

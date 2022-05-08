@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentManager supportFragmentManager = this.getSupportFragmentManager();
         NavHostFragment navHostFragment = (NavHostFragment) supportFragmentManager.findFragmentById(R.id.hostFragment);
-        assert navHostFragment != null;
         this.navController = navHostFragment.getNavController();
 
         // top bar

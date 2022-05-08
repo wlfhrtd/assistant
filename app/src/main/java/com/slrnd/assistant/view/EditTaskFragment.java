@@ -14,7 +14,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +25,12 @@ import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentEditTaskBinding;
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.util.TaskWorker;
-import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
-import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
+import com.slrnd.assistant.viewmodel.TaskViewModel;
+import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,10 +41,10 @@ public class EditTaskFragment extends Fragment implements
 
 {
 
-    private TaskDetailsViewModel viewModel;
+    private TaskViewModel taskViewModel;
     private FragmentEditTaskBinding binding;
 
-    private TaskCreateViewModel taskCreateViewModel;
+    private TaskListViewModel taskListViewModel;
     private ArrayList<Task> tasks;
 
     // add originalHM to check if changed and do checks if yes
@@ -71,63 +69,48 @@ public class EditTaskFragment extends Fragment implements
 
         super.onViewCreated(view, savedInstanceState);
 
-        this.viewModel = new ViewModelProvider(this).get(TaskDetailsViewModel.class);
+        this.taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
 
         int id = EditTaskFragmentArgs.fromBundle(requireArguments()).getId();
-        this.viewModel.fetch(id);
+        this.taskViewModel.fetch(id);
 
-        this.taskCreateViewModel = new ViewModelProvider(this).get(TaskCreateViewModel.class);
-        // yyyy-mm-dd
-        String stringDate = EditTaskFragmentArgs.fromBundle(requireArguments()).getStringDate();
-        this.taskCreateViewModel.fetch(stringDate);
+        this.taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+
+        int date = EditTaskFragmentArgs.fromBundle(requireArguments()).getDate();
+        this.taskListViewModel.fetch(date);
 
         this.binding.setSaveListener(this);
         this.binding.setListenerTime(this);
 
-        observeViewModel();
+        observeTaskViewModel();
 
-        observeTaskCreateViewModel();
+        observeTaskListViewModel();
     }
 
-    private void observeViewModel() {
+    private void observeTaskViewModel() {
 
-        this.viewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> {
+        this.taskViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> {
 
             binding.setTask(task);
 
-            String stringDate = task.getString_date();
-            String stringTime = task.getString_time();
-            long timestamp = task.getDatetime() * 1000L;
-            SimpleDateFormat df = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
-            String formatted = df.format(timestamp);
-
-            String d = new SimpleDateFormat("dd").format(timestamp);
-            String m = new SimpleDateFormat("MM").format(timestamp);
-            String y = new SimpleDateFormat("yyyy").format(timestamp);
-            String h = new SimpleDateFormat("HH").format(timestamp);
-            String mm = new SimpleDateFormat("mm").format(timestamp);
-            String s = new SimpleDateFormat("ss").format(timestamp);
-
-            int test = Integer.parseInt(y);
-
-            Log.d("DD", stringDate);
-            Log.d("DD", stringTime);
-            Log.d("DD", formatted);
-            Log.d("DD", d);
-            Log.d("DD", m);
-            Log.d("DD", y);
-            Log.d("DD", h);
-            Log.d("DD", mm);
-            Log.d("DD", s);
-            Log.d("DD", String.valueOf(test));
-
             TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
-            txtTime.setText(task.getString_time());
+
+            long datetimeInMillis = task.getDatetimeInMillis();
+
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+            String taskStringTime = df.format(datetimeInMillis);
+
+            txtTime.setText(taskStringTime);
+
+            this.originalHour = Integer.parseInt(new SimpleDateFormat("HH").format(datetimeInMillis));
+            this.originalMinute = Integer.parseInt(new SimpleDateFormat("mm").format(datetimeInMillis));
+            this.hour = originalHour;
+            this.minute = originalMinute;
         });
     }
 
-    private void observeTaskCreateViewModel() {
-        this.taskCreateViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
+    private void observeTaskListViewModel() {
+        this.taskListViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
 
             this.updateTaskList(list);
         });
@@ -142,47 +125,53 @@ public class EditTaskFragment extends Fragment implements
     @Override
     public void onTaskSaveChanges(View v, Task obj) {
 
-        Date date = new Date(obj.getDatetime());
-        int year = date.getYear();
-        int month = date.getMonth();
-        int day = date.getDay();
-        // y,m,d from task obj; h,m from time picker onTimeSet()
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, this.hour, this.minute);
+        // TODO
+        // need check if changed, origHour origMinute vs this.h this.m
 
-        obj.setString_time(
-                String.valueOf(this.hour)
-                        + '-'
-                        + this.minute
-        );
+        if (this.originalHour != this.hour || this.originalMinute != this.minute) {
+            // update task datetime before check, obj arg contains old value
+            String date = String.valueOf(obj.getDate()); // yyyyMMdd
+            int year = Integer.parseInt(date.substring(0, 4));
+            int month = Integer.parseInt(date.substring(4, 6));
+            int day = Integer.parseInt(date.substring(6));
+            // y,m,d from task obj; h,m from time picker onTimeSet()
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(year, month - 1, day, this.hour, this.minute); // CALENDAR MONTH FIX -1
 
-        // duplication check
-        if (this.tasks != null) {
-            Log.d("OK", "ALLTASKS NOT NULL");
-            for (int i = 0; i < this.tasks.size(); i++) {
-                if (this.tasks.get(i).getString_time().equals(obj.getString_time())) {
-                    Log.d(obj.getString_date(), "CATCH!");
-                    Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
-                    return;
+            // save old datetime to cancel old work; used datetimeInSeconds as unique work names
+            String oldWorkName = String.valueOf(obj.getDatetimeInSeconds());
+
+            // new datetime and duplication check
+            obj.setDatetimeInMillis(calendar.getTimeInMillis());
+            // duplication check
+            if (this.tasks != null) {
+
+                SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+                String taskStringTime = df.format(obj.getDatetimeInMillis());
+
+                for (int i = 0; i < this.tasks.size(); i++) {
+
+                    if (df.format(this.tasks.get(i).getDatetimeInMillis()).equals(taskStringTime)) {
+
+                        Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                 }
             }
+
+            // cancel old work if check passed
+            WorkManager workManager = WorkManager.getInstance(requireContext());
+            workManager.cancelUniqueWork(oldWorkName);
+            // set new work
+            Calendar now = Calendar.getInstance();
+            // diff for work manager delay
+            long diff = (calendar.getTimeInMillis() / 1000L) - (now.getTimeInMillis() / 1000L);
+            // enqueue new work for updated task
+            String uniqueWorkName = String.valueOf(obj.getDatetimeInSeconds());
+            scheduleWork(uniqueWorkName, diff);
         }
 
-        // cancel old work
-        WorkManager workManager = WorkManager.getInstance(requireContext());
-        workManager.cancelUniqueWork(String.valueOf(obj.getDatetime()));
-
-        // saving new date
-        obj.setDatetime(calendar.getTimeInMillis() / 1000L);
-
-        Calendar today = Calendar.getInstance();
-        // diff for work manager delay
-        long diff = (calendar.getTimeInMillis() / 1000L) - (today.getTimeInMillis() / 1000L);
-        // enqueue new work for updated task
-        String uniqueWorkName = String.valueOf(obj.getDatetime());
-        scheduleWork(uniqueWorkName, diff);
-
-        this.viewModel.update(obj); // only title&note updated thx to 2sided @={} databinding
+        this.taskViewModel.update(obj); // only title&note updated thx to 2sided @={} databinding
 
         Toast.makeText(v.getContext(), "Task Updated", Toast.LENGTH_SHORT).show();
 
@@ -219,7 +208,7 @@ public class EditTaskFragment extends Fragment implements
         String formatted_minute_string = String.format("%2s", minute_string).replace(' ', '0');
         // HH:MM
         // 08:05
-        txtTime.setText(formatted_hour_string + '-' + formatted_minute_string);
+        txtTime.setText(formatted_hour_string + ':' + formatted_minute_string);
 
         this.hour = hourOfDay;
         this.minute = minute;

@@ -14,6 +14,7 @@ import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.TaskListItemLayoutBinding;
 import com.slrnd.assistant.model.Task;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,13 +68,16 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         holder.taskItemLayoutBinding.setTask(task);
         if (task.getIs_done() == 0) {
             holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_close_24);
-        }
-        if (task.getIs_done() == 1) {
+        } else {
             holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_done_24);
         }
         // holder.taskItemLayoutBinding.setListener(this);
         holder.taskItemLayoutBinding.setDetailsListener(this);
 
+        // task_time
+        long datetime = task.getDatetimeInSeconds() * 1000L;
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        holder.taskItemLayoutBinding.setTaskTime(df.format(datetime));
     }
 
     @Override

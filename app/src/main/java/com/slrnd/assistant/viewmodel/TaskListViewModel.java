@@ -24,18 +24,12 @@ public class TaskListViewModel extends AndroidViewModel {
         this.taskRepository = new TaskRepository(application);
     }
 
-    public void fetch(String stringDate) {
+    public void fetch(int date) {
 
-        this.taskLD = this.taskRepository.findByDate(stringDate);
+        this.taskLD = this.taskRepository.findByDate(date);
     }
 
     public LiveData<List<Task>> getTaskLiveData() {
         return this.taskLD;
-    }
-
-    public void clearTask(Task task) {
-
-        task.setIs_done(1);
-        this.taskRepository.update(task);
     }
 }

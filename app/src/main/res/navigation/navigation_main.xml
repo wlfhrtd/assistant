@@ -24,13 +24,7 @@
         android:name="com.slrnd.assistant.view.CreateTaskFragment"
         android:label="Create Task" >
         <argument
-            android:name="selectedYear"
-            app:argType="integer" />
-        <argument
-            android:name="selectedMonth"
-            app:argType="integer" />
-        <argument
-            android:name="selectedDayOfMonth"
+            android:name="selectedDate"
             app:argType="integer" />
     </fragment>
     <fragment
@@ -41,8 +35,8 @@
             android:name="id"
             app:argType="integer" />
         <argument
-            android:name="stringDate"
-            app:argType="string" />
+            android:name="date"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/detailsTaskFragment"

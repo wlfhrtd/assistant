@@ -33,7 +33,7 @@ public class TaskRepository {
 
     public LiveData<Task> findOneById(int id) {
 
-        return taskDao.selectTask(id);
+        return taskDao.findOneById(id);
 
     }
 
@@ -58,8 +58,8 @@ public class TaskRepository {
         );
      */
 
-    public LiveData<List<Task>> findByDate(String stringDate) {
+    public LiveData<List<Task>> findByDate(int date) {
 
-        return taskDao.findByDate(stringDate);
+        return taskDao.findByDate(date);
     }
 }

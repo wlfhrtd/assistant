@@ -9,6 +9,9 @@
             name="task"
             type="com.slrnd.assistant.model.Task" />
         <variable
+            name="task_time"
+            type="String" />
+        <variable
             name="detailsListener"
             type="com.slrnd.assistant.view.TaskDetailsClickListener" />
 
@@ -26,7 +29,7 @@
             android:layout_marginEnd="24dp"
             android:gravity="center|start"
             android:minHeight="36dp"
-            android:text='@{task.title + " // " + task.string_time}'
+            android:text='@{task.title + " // " + task_time}'
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

@@ -12,12 +12,12 @@ import com.slrnd.assistant.model.TaskRepository;
 
 import java.util.List;
 
-public class TaskDetailsViewModel extends AndroidViewModel {
+public class TaskViewModel extends AndroidViewModel {
 
     private TaskRepository taskRepository;
     private LiveData<Task> taskLD;
 
-    public TaskDetailsViewModel(@NonNull Application application) {
+    public TaskViewModel(@NonNull Application application) {
 
         super(application);
 

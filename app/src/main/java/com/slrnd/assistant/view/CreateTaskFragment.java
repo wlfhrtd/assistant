@@ -1,7 +1,6 @@
 package com.slrnd.assistant.view;
 
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,7 +12,6 @@ import androidx.navigation.Navigation;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.text.format.DateFormat;
@@ -25,20 +23,18 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentCreateTaskBinding;
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.util.TaskWorker;
-import com.slrnd.assistant.viewmodel.TaskCreateViewModel;
-import com.slrnd.assistant.viewmodel.TaskDetailsViewModel;
+import com.slrnd.assistant.viewmodel.TaskViewModel;
+import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class CreateTaskFragment extends Fragment implements
@@ -50,15 +46,14 @@ public class CreateTaskFragment extends Fragment implements
 
 {
 
-    private TaskDetailsViewModel viewModel;
+    private TaskViewModel taskViewModel;
     private FragmentCreateTaskBinding binding;
 
-    private TaskCreateViewModel taskCreateViewModel;
+    private TaskListViewModel taskListViewModel;
     private ArrayList<Task> tasks;
 
-    private int year = 0;
-    private int month = 0;
-    private int day = 0;
+    private int selectedDate = 0; // yyyyMMdd
+
     private int hour = 0;
     private int minute = 0;
 
@@ -78,17 +73,14 @@ public class CreateTaskFragment extends Fragment implements
 
         super.onViewCreated(view, savedInstanceState);
 
-        this.year = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedYear();
-        this.month = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedMonth();
-        this.day = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedDayOfMonth();
+        this.selectedDate = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedDate();
 
-        this.viewModel = new ViewModelProvider(this).get(TaskDetailsViewModel.class);
+        this.taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
 
-        this.taskCreateViewModel = new ViewModelProvider(this).get(TaskCreateViewModel.class);
-        String stringDate = String.valueOf(this.year) + '-' + this.month + '-' + this.day;
-        this.taskCreateViewModel.fetch(stringDate);
+        this.taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+        this.taskListViewModel.fetch(this.selectedDate);
 
-        this.binding.setTask(new Task("", "", 0));
+        this.binding.setTask(new Task("", "", 0, this.selectedDate));
         this.binding.setCreateButtonListener(this);
         // date and time pickers
         // this.binding.setListenerDate(this);
@@ -98,7 +90,7 @@ public class CreateTaskFragment extends Fragment implements
     }
 
     private void observeViewModel() {
-        this.taskCreateViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
+        this.taskListViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
 
             this.updateTaskList(list);
         });
@@ -114,50 +106,41 @@ public class CreateTaskFragment extends Fragment implements
     public void onTaskCreateButton(View v) {
         // get task obj
         Task task = this.binding.getTask();
-        // getting date (check listeners)
+        // date from args (should be set to object already), hh:mm from time picker onTimeSet
+        String date = String.valueOf(task.getDate()); // yyyyMMdd
+        int year = Integer.parseInt(date.substring(0, 4));
+        int month = Integer.parseInt(date.substring(4, 6)); // STORING MONTH AS 1 FOR JANUARY 12 DECEMBER
+        int day = Integer.parseInt(date.substring(6));
+
+        // CALENDAR USES 0 FOR JANUARY 11 DECEMBER
+        // EVERY TIME BUILDING CALENDAR FROM TASK OBJECTS SHOULD FIX MONTH LIKE 0 FOR JANUARY 11 DECEMBER INSTEAD OF 1 FOR JANUARY 12 DECEMBER
+        // SO JUST SUBTRACT 1 FROM MONTH
         Calendar calendar = Calendar.getInstance();
-        calendar.set(this.year, this.month, this.day, this.hour, this.minute);
+        calendar.set(year, month - 1, day, this.hour, this.minute); // CALENDAR MONTH FIX -1
 
-        task.setString_date(
-                String.valueOf(this.year)
-                        + '-'
-                        + this.month
-                        + '-'
-                        + this.day
-        );
-
-        task.setString_time(
-                String.valueOf(this.hour)
-                        + '-'
-                        + this.minute
-        );
+        task.setDatetimeInMillis(calendar.getTimeInMillis());
 
         // duplication check
         if (this.tasks != null) {
-            Log.d("OK", "ALLTASKS NOT NULL");
+
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+            String taskStringTime = df.format(task.getDatetimeInMillis());
+
             for (int i = 0; i < this.tasks.size(); i++) {
-                if (this.tasks.get(i).getString_time().equals(task.getString_time())) {
-                    Log.d(task.getString_date(), "CATCH!");
+
+                if (df.format(this.tasks.get(i).getDatetimeInMillis()).equals(taskStringTime)) {
+
                     Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
                     return;
                 }
             }
         }
 
-        Calendar today = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
         // diff for work manager delay
-        long diff = (calendar.getTimeInMillis() / 1000L) - (today.getTimeInMillis() / 1000L);
+        long diff = (calendar.getTimeInMillis() / 1000L) - (now.getTimeInMillis() / 1000L);
 
-        // saving task date to task obj
-        task.setDatetime(calendar.getTimeInMillis() / 1000L);
-
-        // immediate notif
-        // new NotificationHelper(this.getContext()).createNotification("Task Created", "The new task has been created");
-
-        // WorkManager.getInstance(requireContext()).enqueue(myWorkRequest); // uniqueness issue
-
-        // checking for existing/duplication; used task.date as uuid
-        String uniqueWorkName = String.valueOf(task.getDatetime());
+        String uniqueWorkName = String.valueOf(task.getDatetimeInSeconds());
 
         scheduleWork(uniqueWorkName, diff);
 
@@ -165,7 +148,7 @@ public class CreateTaskFragment extends Fragment implements
 
         // loading new task obj to LD; list for no reason w/e
         List<Task> tasks = Arrays.asList(task);
-        this.viewModel.addTask(tasks);
+        this.taskViewModel.addTask(tasks);
 
         Navigation.findNavController(v).popBackStack();
     }
@@ -188,6 +171,7 @@ public class CreateTaskFragment extends Fragment implements
                 myWorkRequest);
     }
 
+    /*
     private boolean isWorkScheduled(String uniqueWorkName, Context context) {
 
         WorkManager workManager = WorkManager.getInstance(context);
@@ -211,7 +195,7 @@ public class CreateTaskFragment extends Fragment implements
         }
 
         return running;
-    }
+    }*/
 
     /*
     @Override
@@ -239,7 +223,7 @@ public class CreateTaskFragment extends Fragment implements
     @Override
     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
-        Calendar.getInstance().set(year, month, day);
+        Calendar.getInstance().set(year, month, day); ???nvm
 
         TextView txtDate = this.binding.getRoot().findViewById(R.id.txtDate);
         // add leading zero to month
@@ -270,7 +254,7 @@ public class CreateTaskFragment extends Fragment implements
         String formatted_minute_string = String.format("%2s", minute_string).replace(' ', '0');
         // HH:MM
         // 08:05
-        txtTime.setText(formatted_hour_string + '-' + formatted_minute_string);
+        txtTime.setText(formatted_hour_string + ':' + formatted_minute_string);
 
         this.hour = hourOfDay;
         this.minute = minute;

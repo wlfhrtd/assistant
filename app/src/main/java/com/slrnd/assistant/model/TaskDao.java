@@ -23,10 +23,10 @@ public interface TaskDao {
     LiveData<List<Task>> getAllTasks();
 
     @Query("SELECT * FROM task WHERE id = :id")
-    LiveData<Task> selectTask(Integer id);
+    LiveData<Task> findOneById(int id);
 
-    @Query("SELECT * FROM task WHERE string_date = :stringDate ORDER BY is_done ASC, datetime ASC")
-    LiveData<List<Task>> findByDate(String stringDate);
+    @Query("SELECT * FROM task WHERE date = :date ORDER BY is_done ASC, datetime ASC")
+    LiveData<List<Task>> findByDate(int date);
 
     @Delete
     void delete(Task task);

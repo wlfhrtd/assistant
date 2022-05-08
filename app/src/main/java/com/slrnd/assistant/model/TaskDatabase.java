@@ -12,11 +12,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Task.class}, version = 3, exportSchema = false)
+@Database(entities = {Task.class}, version = 1, exportSchema = false)
 public abstract class TaskDatabase extends RoomDatabase {
 
-    private static String DB_NAME = "task_db";
+    private static String DB_NAME = "taskdb";
 
+    /*
     private static Migration MIGRATION_1_2 = new Migration(1,2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -29,7 +30,7 @@ public abstract class TaskDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE task ADD COLUMN string_time TEXT");
         }
-    };
+    };*/
 
     public abstract TaskDao taskDao();
 
@@ -46,7 +47,7 @@ public abstract class TaskDatabase extends RoomDatabase {
                             TaskDatabase.class,
                             DB_NAME
                     )
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                            // .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                             .build();
                 }
             }

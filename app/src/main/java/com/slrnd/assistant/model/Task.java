@@ -16,20 +16,19 @@ public class Task {
     private String note;
     @ColumnInfo(name = "is_done")
     private int is_done;
+
     @ColumnInfo(name = "datetime")
-    private long datetime;
+    private long datetime; // unix time in SECONDS
+    @ColumnInfo(name = "date")
+    private int date; // yyyyMMdd
 
-    @ColumnInfo(name = "string_date")
-    private String string_date;
-    @ColumnInfo(name = "string_time")
-    private String string_time;
-
-    public Task(String title, String note, long datetime) {
+    public Task(String title, String note, long datetime, int date) {
 
         this.title = title;
         this.note = note;
         this.is_done = 0;
         this.datetime = datetime;
+        this.date = date;
     }
 
     public Integer getId() {
@@ -64,27 +63,31 @@ public class Task {
         this.is_done = is_done;
     }
 
-    public long getDatetime() {
+    protected long getDatetime() {
+        return datetime;
+    } // required for ORDER BY datetime in DAO
+
+    public long getDatetimeInSeconds() {
         return datetime;
     }
 
-    public void setDatetime(long datetime) {
+    public void setDatetimeInSeconds(long datetime) {
         this.datetime = datetime;
     }
 
-    public String getString_date() {
-        return string_date;
+    public long getDatetimeInMillis() {
+        return datetime * 1000L;
     }
 
-    public void setString_date(String string_date) {
-        this.string_date = string_date;
+    public void setDatetimeInMillis(long datetimeInMillis) {
+        this.datetime = datetimeInMillis / 1000L;
     }
 
-    public String getString_time() {
-        return string_time;
+    public int getDate() {
+        return date;
     }
 
-    public void setString_time(String string_time) {
-        this.string_time = string_time;
+    public void setDate(int date) {
+        this.date = date;
     }
 }

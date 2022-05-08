@@ -124,10 +124,7 @@ public class EditTaskFragment extends Fragment implements
 
     @Override
     public void onTaskSaveChanges(View v, Task obj) {
-
-        // TODO
-        // need check if changed, origHour origMinute vs this.h this.m
-
+        // if date unchanged we don't set new datetime and don't cancel work
         if (this.originalHour != this.hour || this.originalMinute != this.minute) {
             // update task datetime before check, obj arg contains old value
             String date = String.valueOf(obj.getDate()); // yyyyMMdd

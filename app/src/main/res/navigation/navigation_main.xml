@@ -22,20 +22,13 @@
     <fragment
         android:id="@+id/createTaskFragment"
         android:name="com.slrnd.assistant.view.CreateTaskFragment"
-        android:label="Create Task" >
-        <argument
-            android:name="selectedDate"
-            app:argType="integer" />
-    </fragment>
+        android:label="Create Task" />
     <fragment
         android:id="@+id/editTaskFragment"
         android:name="com.slrnd.assistant.view.EditTaskFragment"
         android:label="Edit Task">
         <argument
             android:name="id"
-            app:argType="integer" />
-        <argument
-            android:name="date"
             app:argType="integer" />
     </fragment>
     <fragment
@@ -47,9 +40,6 @@
             app:destination="@id/editTaskFragment" />
         <argument
             android:name="id"
-            app:argType="integer" />
-        <argument
-            android:name="isDone"
             app:argType="integer" />
     </fragment>
 </navigation>

@@ -74,10 +74,7 @@ public class EditTaskFragment extends Fragment implements
         int id = EditTaskFragmentArgs.fromBundle(requireArguments()).getId();
         this.taskViewModel.fetch(id);
 
-        this.taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
-
-        int date = EditTaskFragmentArgs.fromBundle(requireArguments()).getDate();
-        this.taskListViewModel.fetch(date);
+        this.taskListViewModel = new ViewModelProvider(requireActivity()).get(TaskListViewModel.class);
 
         this.binding.setSaveListener(this);
         this.binding.setListenerTime(this);

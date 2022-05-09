@@ -73,12 +73,10 @@ public class CreateTaskFragment extends Fragment implements
 
         super.onViewCreated(view, savedInstanceState);
 
-        this.selectedDate = CreateTaskFragmentArgs.fromBundle(requireArguments()).getSelectedDate();
-
         this.taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
 
-        this.taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
-        this.taskListViewModel.fetch(this.selectedDate);
+        this.taskListViewModel = new ViewModelProvider(requireActivity()).get(TaskListViewModel.class);
+        this.selectedDate = TaskListViewModel.getDATE();
 
         this.binding.setTask(new Task("", "", 0, this.selectedDate));
         this.binding.setCreateButtonListener(this);
@@ -104,9 +102,9 @@ public class CreateTaskFragment extends Fragment implements
 
     @Override
     public void onTaskCreateButton(View v) {
-        // get task obj
+
         Task task = this.binding.getTask();
-        // date from args (should be set to object already), hh:mm from time picker onTimeSet
+        // date from taskListViewModel (should be set to object already), hh:mm from time picker onTimeSet
         String date = String.valueOf(task.getDate()); // yyyyMMdd
         int year = Integer.parseInt(date.substring(0, 4));
         int month = Integer.parseInt(date.substring(4, 6)); // STORING MONTH AS 1 FOR JANUARY 12 DECEMBER

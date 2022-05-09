@@ -28,6 +28,7 @@ public class DetailsTaskFragment extends Fragment {
 
     private TaskViewModel taskViewModel;
     private FragmentDetailsTaskBinding binding;
+    private int IS_DONE;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class DetailsTaskFragment extends Fragment {
         return this.binding.getRoot();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O) // Month enum usage
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
@@ -50,16 +51,17 @@ public class DetailsTaskFragment extends Fragment {
 
         observeViewModel();
 
-        int isDone = DetailsTaskFragmentArgs.fromBundle(requireArguments()).getIsDone();
-        if (isDone == 0) {
+        View doneBar = view.findViewById(R.id.done_bar); // for task.is_done==1
+        View detailsFragmentTaskActions = view.findViewById(R.id.details_fragment_task_actions); // for task.is_done==0
 
-            View doneBar = view.findViewById(R.id.done_bar);
+        if (this.IS_DONE == 0) {
+            // visible in layout by default (for is_done==1) in place of action bar; is_done==1 - no actions allowed
             doneBar.setVisibility(View.GONE);
-
-            View detailsFragmentTaskActions = view.findViewById(R.id.details_fragment_task_actions);
+            // invisible in layout by default (for is_done==1); is_done==0 - allow actions
             detailsFragmentTaskActions.setVisibility(View.VISIBLE);
 
             WorkManager workManager = WorkManager.getInstance(requireContext());
+
             // DELETE
             ImageView imgDetailsTaskDelete = view.findViewById(R.id.imgDetailsTaskDelete);
             imgDetailsTaskDelete.setOnClickListener(view13 -> {
@@ -76,8 +78,7 @@ public class DetailsTaskFragment extends Fragment {
             ImageView imgDetailsTaskEdit = view.findViewById(R.id.imgDetailsTaskEdit);
             imgDetailsTaskEdit.setOnClickListener(view1 -> {
 
-                int date = binding.getTask().getDate();
-                DetailsTaskFragmentDirections.ActionEditTaskFragment action = DetailsTaskFragmentDirections.actionEditTaskFragment(id, date);
+                DetailsTaskFragmentDirections.ActionEditTaskFragment action = DetailsTaskFragmentDirections.actionEditTaskFragment(id);
                 Navigation.findNavController(view1).navigate(action);
             });
             // FINISH
@@ -92,15 +93,22 @@ public class DetailsTaskFragment extends Fragment {
 
                 Navigation.findNavController(view12).popBackStack();
             });
+        } else {
+
+            // set in layout but just to be sure
+            doneBar.setVisibility(View.VISIBLE);
+            detailsFragmentTaskActions.setVisibility(View.GONE);
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O) // Month enum usage
     private void observeViewModel() {
 
         this.taskViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> {
 
             binding.setTask(task);
+
+            IS_DONE = task.getIs_done();
 
             // txtDetailsTaskDate
             String date = String.valueOf(task.getDate()); // yyyyMMdd
@@ -109,7 +117,7 @@ public class DetailsTaskFragment extends Fragment {
             int day = Integer.parseInt(date.substring(6));
             binding.setTaskDate(String.valueOf(day) + ' ' + Month.of(month) + ' ' + year); // 5 MAY 2022
             // txtDetailsTaskTime
-            long datetime = task.getDatetimeInSeconds() * 1000L;
+            long datetime = task.getDatetimeInMillis();
             SimpleDateFormat df = new SimpleDateFormat("HH:mm");
             binding.setTaskTime(df.format(datetime));
         });

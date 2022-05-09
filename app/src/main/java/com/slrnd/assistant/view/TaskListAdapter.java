@@ -24,24 +24,19 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         private TaskListItemLayoutBinding taskItemLayoutBinding;
 
-        public TaskListViewHolder(TaskListItemLayoutBinding todoItemLayoutBinding) {
+        public TaskListViewHolder(TaskListItemLayoutBinding taskItemLayoutBinding) {
 
-            super(todoItemLayoutBinding.getRoot());
+            super(taskItemLayoutBinding.getRoot());
 
-            this.taskItemLayoutBinding = todoItemLayoutBinding;
+            this.taskItemLayoutBinding = taskItemLayoutBinding;
         }
     }
 
     private ArrayList<Task> tasks;
 
-    // private final TaskListFragment.onCheckedChangedListener mListener;
-
-    public TaskListAdapter(ArrayList<Task> tasks) { // TaskListFragment.onCheckedChangedListener listener) {
+    public TaskListAdapter(ArrayList<Task> tasks) {
 
         this.tasks = tasks;
-
-        // mListener = listener;
-
     }
 
     public void updateTaskList(List<Task> newTasks) {
@@ -66,16 +61,19 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         Task task = this.tasks.get(position);
         holder.taskItemLayoutBinding.setTask(task);
+
         if (task.getIs_done() == 0) {
+
             holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_close_24);
         } else {
+
             holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_done_24);
         }
-        // holder.taskItemLayoutBinding.setListener(this);
+
         holder.taskItemLayoutBinding.setDetailsListener(this);
 
         // task_time
-        long datetime = task.getDatetimeInSeconds() * 1000L;
+        long datetime = task.getDatetimeInMillis();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
         holder.taskItemLayoutBinding.setTaskTime(df.format(datetime));
     }
@@ -85,24 +83,12 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         return this.tasks.size();
     }
 
-    /*
-    @Override
-    public void onCheckChanged(CompoundButton cb, Boolean isChecked, Task obj) {
-
-        if (isChecked) {
-
-            mListener.onCheckedChanged(obj);
-        }
-    }*/
-
     @Override
     public void onDetailsClick(View v) {
 
         int id = Integer.parseInt(v.getTag().toString());
 
-        int isDone = Integer.parseInt(v.getRootView().findViewById(R.id.imgIcon).getTag().toString());
-
-        TaskListFragmentDirections.ActionDetailsTaskFragment action = TaskListFragmentDirections.actionDetailsTaskFragment(id, isDone);
+        TaskListFragmentDirections.ActionDetailsTaskFragment action = TaskListFragmentDirections.actionDetailsTaskFragment(id);
         Navigation.findNavController(v).navigate(action);
     }
 }

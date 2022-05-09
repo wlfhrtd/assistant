@@ -19,12 +19,14 @@ import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,15 +73,13 @@ public class TaskListFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
-        this.taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+        this.taskListViewModel = new ViewModelProvider(requireActivity()).get(TaskListViewModel.class);
 
-        // TODO add 'last open' functionality, change popBackStack() from CreateFrag behaviour - it resets calendarView and list to TODAY everytime
-        // opening TODAY by default; not working with 'saved state' or 'last open' yet
+        // fresh start, show TODAY; listviewmodel.DATE != 0 => data already loaded
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH); // returns a single digit, 0 for January 11 december
         int day = calendar.get(Calendar.DAY_OF_MONTH); // single digit, no leading zero
-
         // DATE INTEGER FORMAT
         // add leading zero to month; required pattern yyyyMMdd
         int human_month = month+1; // fix start of January as 0 to start with 1
@@ -90,24 +90,50 @@ public class TaskListFragment extends Fragment {
         String formatted_day_string = String.format("%2s", day_string).replace(' ', '0');
         // yyyyMMdd
         // 20990501
-        int date = Integer.parseInt(year + formatted_human_month_string + formatted_day_string);
-
-        this.taskListViewModel.fetch(date);
-        this.selectedDate = date;
-        this.TODAY = date;
+        int now = Integer.parseInt(year + formatted_human_month_string + formatted_day_string);
+        this.TODAY = now;
 
         TextView txtBottomSheetDay = view.findViewById(R.id.txtBottomSheetDay);
-        Date datetime = calendar.getTime();
-        // Monday 20-april-2000
-        txtBottomSheetDay.setText(
-                String.valueOf(android.text.format.DateFormat.format("EEEE", datetime))
-                + ' '
-                + day
-                + '-'
-                + android.text.format.DateFormat.format("MMMM", datetime)
-                + '-'
-                + year
-        );
+
+        if (TaskListViewModel.getDATE() == 0) {
+            // fresh start
+            this.taskListViewModel.fetch(now);
+            this.selectedDate = now;
+
+            Date datetime = calendar.getTime();
+            // Monday 20-april-2000
+            txtBottomSheetDay.setText(
+                    String.valueOf(android.text.format.DateFormat.format("EEEE", datetime))
+                            + ' '
+                            + day
+                            + '-'
+                            + android.text.format.DateFormat.format("MMMM", datetime)
+                            + '-'
+                            + year
+            );
+        } else {
+            // data loaded in viewmodel
+            this.selectedDate = TaskListViewModel.getDATE();
+
+            String date = String.valueOf(this.selectedDate); // yyyyMMdd
+            year = Integer.parseInt(date.substring(0, 4));
+            month = Integer.parseInt(date.substring(4, 6)); // STORING MONTH AS 1 FOR JANUARY 12 DECEMBER
+            day = Integer.parseInt(date.substring(6));
+
+            calendar.set(year, month - 1, day, 0, 0); // MONTH -1 FIX!!!
+
+            Date datetime = calendar.getTime();
+            // Monday 20-april-2000
+            txtBottomSheetDay.setText(
+                    String.valueOf(android.text.format.DateFormat.format("EEEE", datetime))
+                            + ' '
+                            + day
+                            + '-'
+                            + android.text.format.DateFormat.format("MMMM", datetime)
+                            + '-'
+                            + year
+            );
+        }
 
         RecyclerView recyclerView = view.findViewById(R.id.recTodoList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -136,7 +162,7 @@ public class TaskListFragment extends Fragment {
                 headerArrowImage.setRotation(slideOffset * -180);
             }
         });
-
+        // add new task button in bottomsheet
         ImageView bottomSheetAdd = view.findViewById(R.id.bottomSheetAdd);
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
@@ -175,8 +201,7 @@ public class TaskListFragment extends Fragment {
                                 + '-'
                                 + year
                 );
-
-                // TODO attention to TODAY when change popbacks, 'last open's etc behaviour
+                // hide new task button if date is not actual
                 if (selectedDate < TODAY) {
 
                     bottomSheetAdd.setVisibility(View.GONE);
@@ -190,7 +215,7 @@ public class TaskListFragment extends Fragment {
         // CREATE
         bottomSheetAdd.setOnClickListener(l -> {
 
-            NavDirections action = TaskListFragmentDirections.actionCreateTask(this.selectedDate);
+            NavDirections action = TaskListFragmentDirections.actionCreateTask();
             Navigation.findNavController(view).navigate(action);
         });
 
@@ -201,7 +226,7 @@ public class TaskListFragment extends Fragment {
         this.taskListViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
 
             this.taskListAdapter.updateTaskList(list);
-
+            // empty tasklist text
             TextView txtEmpty = requireView().findViewById(R.id.txtEmpty);
             if (list.isEmpty()) {
 

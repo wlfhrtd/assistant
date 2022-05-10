@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ассистент</string>
+    <string name="pickdate">Выберите дату</string>
+    <string name="picktime">Выберите время</string>
+    <string name="txtDetailsTaskFragmentTitle">Детали</string>
+    <string name="savechanges">Сохранить изменения</string>
+    <string name="edittask">Редактировать задачу</string>
+    <string name="createtask">Создать задачу</string>
+    <string name="enternote">Введите заметку</string>
+    <string name="entertitle">Введите название</string>
+    <string name="newtask">Новая задача</string>
+    <string name="emptytasklist">У вас нет никаких задач. Создайте новую</string>
+</resources>

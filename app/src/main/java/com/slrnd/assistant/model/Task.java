@@ -4,6 +4,10 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.SimpleTimeZone;
+
 @Entity
 public class Task {
 
@@ -84,10 +88,38 @@ public class Task {
     }
 
     public int getDate() {
+        // yyyyMMdd eg 20990501
         return date;
     }
 
     public void setDate(int date) {
+        // yyyyMMdd eg 20990501
         this.date = date;
+    }
+
+    public int getYear() {
+
+        return Integer.parseInt(String.valueOf(this.date).substring(0, 4));
+    }
+
+    // IMPORTANT NOTE!!!
+    // CALENDAR USES 0 FOR JANUARY 11 DECEMBER
+    // EVERY TIME BUILDING CALENDAR FROM TASK OBJECTS SHOULD FIX MONTH LIKE 0 FOR JANUARY 11 DECEMBER INSTEAD OF 1 FOR JANUARY 12 DECEMBER
+    // SO JUST SUBTRACT 1 FROM MONTH
+    // Calendar calendar = Calendar.getInstance();
+    // calendar.set(year, month - 1, day, this.hour, this.minute); // CALENDAR MONTH FIX -1
+    public int getMonth() {
+        // STORING MONTH AS 1 FOR JANUARY 12 DECEMBER; WITH LEADING ZERO FOR SINGLE DIGIT MONTH VALUES E.G 01 02 03
+        return Integer.parseInt(String.valueOf(this.date).substring(4, 6));
+    }
+
+    public int getDayOfMonth() {
+        // STORING WITH LEADING ZERO FOR SINGLE DIGIT DAY VALUES E.G 01 02 03
+        return Integer.parseInt(String.valueOf(this.date).substring(6));
+    }
+
+    public String getStringTime() {
+        // HH:mm; formatter requires datetime in millis or seconds*1000L
+        return new SimpleDateFormat("HH:mm").format(this.getDatetimeInMillis());
     }
 }

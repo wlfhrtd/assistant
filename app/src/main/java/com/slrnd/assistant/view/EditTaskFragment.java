@@ -2,6 +2,12 @@ package com.slrnd.assistant.view;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -13,20 +19,12 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-import android.text.format.DateFormat;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
-
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentEditTaskBinding;
 import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.util.TaskWorker;
-import com.slrnd.assistant.viewmodel.TaskViewModel;
 import com.slrnd.assistant.viewmodel.TaskListViewModel;
+import com.slrnd.assistant.viewmodel.TaskViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +45,7 @@ public class EditTaskFragment extends Fragment implements
     private TaskListViewModel taskListViewModel;
     private ArrayList<Task> tasks;
 
-    // add originalHM to check if changed and do checks if yes
+    // to check if task time has been changed and needs check for duplication conflict
     private int originalHour = 0;
     private int originalMinute = 0;
     private int hour = 0;
@@ -59,7 +57,7 @@ public class EditTaskFragment extends Fragment implements
 
         this.binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_task, container, false);
 
-        this.tasks = new ArrayList<Task>();
+        this.tasks = new ArrayList<>();
 
         return this.binding.getRoot();
     }
@@ -70,13 +68,14 @@ public class EditTaskFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         this.taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
-
+        // task.id
         int id = EditTaskFragmentArgs.fromBundle(requireArguments()).getId();
         this.taskViewModel.fetch(id);
-
+        // shared viewModel
         this.taskListViewModel = new ViewModelProvider(requireActivity()).get(TaskListViewModel.class);
-
+        // for "save changes" button
         this.binding.setSaveListener(this);
+        // for "pick time" field
         this.binding.setListenerTime(this);
 
         observeTaskViewModel();
@@ -88,16 +87,11 @@ public class EditTaskFragment extends Fragment implements
 
         this.taskViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), task -> {
 
-            binding.setTask(task);
-
-            TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
+            this.binding.setTask(task);
 
             long datetimeInMillis = task.getDatetimeInMillis();
 
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-            String taskStringTime = df.format(datetimeInMillis);
-
-            txtTime.setText(taskStringTime);
+            this.binding.txtTaskTime.setText(new SimpleDateFormat("HH:mm").format(datetimeInMillis));
 
             this.originalHour = Integer.parseInt(new SimpleDateFormat("HH").format(datetimeInMillis));
             this.originalMinute = Integer.parseInt(new SimpleDateFormat("mm").format(datetimeInMillis));
@@ -107,6 +101,7 @@ public class EditTaskFragment extends Fragment implements
     }
 
     private void observeTaskListViewModel() {
+
         this.taskListViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
 
             this.updateTaskList(list);
@@ -123,40 +118,35 @@ public class EditTaskFragment extends Fragment implements
     public void onTaskSaveChanges(View v, Task obj) {
         // if date unchanged we don't set new datetime and don't cancel work
         if (this.originalHour != this.hour || this.originalMinute != this.minute) {
-            // update task datetime before check, obj arg contains old value
-            String date = String.valueOf(obj.getDate()); // yyyyMMdd
-            int year = Integer.parseInt(date.substring(0, 4));
-            int month = Integer.parseInt(date.substring(4, 6));
-            int day = Integer.parseInt(date.substring(6));
-            // y,m,d from task obj; h,m from time picker onTimeSet()
+            // update task datetime before check, obj contains old value
+            int year = obj.getYear();
+            int month = obj.getMonth();
+            int day = obj.getDayOfMonth();
+            // h,m from time picker onTimeSet()
             Calendar calendar = Calendar.getInstance();
             calendar.set(year, month - 1, day, this.hour, this.minute); // CALENDAR MONTH FIX -1
 
-            // save old datetime to cancel old work; used datetimeInSeconds as unique work names
-            String oldWorkName = String.valueOf(obj.getDatetimeInSeconds());
-
-            // new datetime and duplication check
-            obj.setDatetimeInMillis(calendar.getTimeInMillis());
+            long timeToCheck = calendar.getTimeInMillis();
+            String stringTimeToCheck = new SimpleDateFormat("HH:mm").format(timeToCheck);
             // duplication check
             if (this.tasks != null) {
 
-                SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-                String taskStringTime = df.format(obj.getDatetimeInMillis());
-
                 for (int i = 0; i < this.tasks.size(); i++) {
+                    // getStringTime() returns HH:mm
+                    if (this.tasks.get(i).getStringTime().equals(stringTimeToCheck)) {
 
-                    if (df.format(this.tasks.get(i).getDatetimeInMillis()).equals(taskStringTime)) {
-
-                        Toast.makeText(this.getContext(), "TASK DUPLICATION", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this.getContext(), R.string.duplicationtask, Toast.LENGTH_LONG).show();
                         return;
                     }
                 }
             }
-
-            // cancel old work if check passed
+            // passed duplication check
+            // cancel old work
             WorkManager workManager = WorkManager.getInstance(requireContext());
-            workManager.cancelUniqueWork(oldWorkName);
-            // set new work
+            workManager.cancelUniqueWork(String.valueOf(obj.getDatetimeInSeconds())); // task still has old datetime
+            // save new datetime to task
+            obj.setDatetimeInMillis(timeToCheck); // now task has new datetime
+            // setup new work
             Calendar now = Calendar.getInstance();
             // diff for work manager delay
             long diff = (calendar.getTimeInMillis() / 1000L) - (now.getTimeInMillis() / 1000L);
@@ -164,11 +154,11 @@ public class EditTaskFragment extends Fragment implements
             String uniqueWorkName = String.valueOf(obj.getDatetimeInSeconds());
             scheduleWork(uniqueWorkName, diff);
         }
-
+        // updating task object
         this.taskViewModel.update(obj); // only title&note updated thx to 2sided @={} databinding
 
-        Toast.makeText(v.getContext(), "Task Updated", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(v.getContext(), R.string.taskupdated, Toast.LENGTH_SHORT).show();
+        // popBack to detailsTaskFragment
         Navigation.findNavController(v).popBackStack();
     }
 
@@ -179,8 +169,8 @@ public class EditTaskFragment extends Fragment implements
         OneTimeWorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(TaskWorker.class)
                 .setInitialDelay(diff, TimeUnit.SECONDS)
                 .setInputData(new Data.Builder()
-                        .putString("title", "Edited task: " + this.binding.getTask().getTitle())
-                        .putString("message", "The task has been updated: " + this.binding.getTask().getNote())
+                        .putString("title", R.string.taskupdated + ": " + this.binding.getTask().getTitle())
+                        .putString("message", R.string.taskupdated + ": " + this.binding.getTask().getNote())
                         .build())
                 .build();
 
@@ -192,8 +182,6 @@ public class EditTaskFragment extends Fragment implements
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-
-        TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
         // add leading zero to hourOfDay
         String hour_string = String.valueOf(hourOfDay);
         String formatted_hour_string = String.format("%2s", hour_string).replace(' ', '0');
@@ -202,7 +190,7 @@ public class EditTaskFragment extends Fragment implements
         String formatted_minute_string = String.format("%2s", minute_string).replace(' ', '0');
         // HH:MM
         // 08:05
-        txtTime.setText(formatted_hour_string + ':' + formatted_minute_string);
+        this.binding.txtTaskTime.setText(formatted_hour_string + ':' + formatted_minute_string);
 
         this.hour = hourOfDay;
         this.minute = minute;

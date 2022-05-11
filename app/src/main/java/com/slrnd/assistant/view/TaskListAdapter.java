@@ -3,7 +3,6 @@ package com.slrnd.assistant.view;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -53,7 +52,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         TaskListItemLayoutBinding binding = DataBindingUtil.inflate(inflater, R.layout.task_list_item_layout, parent, false);
 
         return new TaskListViewHolder(binding);
-
     }
 
     @Override
@@ -69,10 +67,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
             holder.taskItemLayoutBinding.imgIcon.setImageResource(R.drawable.ic_baseline_done_24);
         }
-
+        // actionDetailsTaskFragment button
         holder.taskItemLayoutBinding.setDetailsListener(this);
 
-        // task_time
+        // task_time for textView
         long datetime = task.getDatetimeInMillis();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
         holder.taskItemLayoutBinding.setTaskTime(df.format(datetime));
@@ -85,7 +83,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
     @Override
     public void onDetailsClick(View v) {
-
+        // no access to task object - using tag property to store task.id required for navigation
         int id = Integer.parseInt(v.getTag().toString());
 
         TaskListFragmentDirections.ActionDetailsTaskFragment action = TaskListFragmentDirections.actionDetailsTaskFragment(id);

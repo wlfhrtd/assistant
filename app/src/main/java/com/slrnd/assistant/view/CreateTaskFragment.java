@@ -15,14 +15,14 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.slrnd.assistant.R;
 import com.slrnd.assistant.databinding.FragmentCreateTaskBinding;
 import com.slrnd.assistant.model.Task;
@@ -32,7 +32,6 @@ import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -106,7 +105,30 @@ public class CreateTaskFragment extends Fragment implements
 
     @Override
     public void onTaskCreateButton(View v) {
+        // input validation
+        // task title
+        TextInputEditText txtTaskTitle = this.binding.txtTaskTitle;
+        if (txtTaskTitle.getText().toString().length() == 0) {
 
+            txtTaskTitle.setError(getResources().getString(R.string.entertitle));
+            return;
+        }
+        // task note
+        TextInputEditText txtTaskNote = this.binding.txtTaskNote;
+        if (txtTaskNote.getText().toString().length() == 0) {
+
+            txtTaskNote.setError(getResources().getString(R.string.enternote));
+            return;
+        }
+        // task time; due to layout overlapping have to use setError on inputLayout instead of input itself
+        // and also check for error presence in onTimeSet listener
+        if (this.binding.txtTaskTime.getText().toString().length() == 0) {
+
+            this.binding.layoutTxtTaskTime.setError(getResources().getString(R.string.picktime));
+            return;
+        }
+
+        // entity setup
         Task task = this.binding.getTask();
         // date(yyyyMMdd) from taskListViewModel (should be set to object already), hh:mm from time picker onTimeSet
         int year = task.getYear();
@@ -121,7 +143,6 @@ public class CreateTaskFragment extends Fragment implements
 
         long timeToCheck = calendar.getTimeInMillis();
         String stringTimeToCheck = new SimpleDateFormat("HH:mm").format(timeToCheck);
-
         // duplication check
         if (this.tasks != null) {
 
@@ -129,13 +150,13 @@ public class CreateTaskFragment extends Fragment implements
                 // getStringTime() returns HH:mm
                 if (this.tasks.get(i).getStringTime().equals(stringTimeToCheck)) {
 
-                    Toast.makeText(this.getContext(), "You've already set task for this time. Change time", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this.getContext(), R.string.duplicationtask, Toast.LENGTH_LONG).show();
                     return;
                 }
             }
         }
 
-        // duplication check success
+        // passed duplication check
         task.setDatetimeInMillis(timeToCheck);
 
         // setup work
@@ -147,7 +168,7 @@ public class CreateTaskFragment extends Fragment implements
 
         scheduleWork(uniqueWorkName, diff);
 
-        Toast.makeText(this.getContext(), "Task created", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.getContext(), R.string.taskcreated, Toast.LENGTH_SHORT).show();
 
         // loading new task obj to LD; idk about list but it was about insertAll
         this.taskViewModel.addTask(Collections.singletonList(task));
@@ -162,8 +183,8 @@ public class CreateTaskFragment extends Fragment implements
         OneTimeWorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(TaskWorker.class)
                 .setInitialDelay(diff, TimeUnit.SECONDS)
                 .setInputData(new Data.Builder()
-                        .putString("title", "Task Created: " + this.binding.getTask().getTitle())
-                        .putString("message", "The new task has been created: " + this.binding.getTask().getNote())
+                        .putString("title", R.string.taskcreated + ": " + this.binding.getTask().getTitle())
+                        .putString("message", R.string.taskcreated + ": " + this.binding.getTask().getNote())
                         .build())
                 .build();
 
@@ -185,8 +206,6 @@ public class CreateTaskFragment extends Fragment implements
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-
-        TextView txtTime = this.binding.getRoot().findViewById(R.id.txtTime);
         // add leading zero to hourOfDay
         String hour_string = String.valueOf(hourOfDay);
         String formatted_hour_string = String.format("%2s", hour_string).replace(' ', '0');
@@ -195,7 +214,14 @@ public class CreateTaskFragment extends Fragment implements
         String formatted_minute_string = String.format("%2s", minute_string).replace(' ', '0');
         // HH:mm
         // 08:05
-        txtTime.setText(formatted_hour_string + ':' + formatted_minute_string);
+        this.binding.txtTaskTime.setText(formatted_hour_string + ':' + formatted_minute_string);
+
+        // shown if failed input validation
+        TextInputLayout layoutTxtTaskTime = this.binding.layoutTxtTaskTime;
+        if (layoutTxtTaskTime.isErrorEnabled()) {
+
+            layoutTxtTaskTime.setErrorEnabled(false);
+        }
 
         this.hour = hourOfDay;
         this.minute = minute;

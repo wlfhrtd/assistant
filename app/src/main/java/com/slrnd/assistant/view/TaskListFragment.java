@@ -11,7 +11,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +18,11 @@ import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.slrnd.assistant.R;
-import com.slrnd.assistant.model.Task;
 import com.slrnd.assistant.viewmodel.TaskListViewModel;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,7 +31,6 @@ public class TaskListFragment extends Fragment {
 
     private TaskListViewModel taskListViewModel;
     private TaskListAdapter taskListAdapter;
-    // private onCheckedChangedListener listener;
 
     private int selectedDate = 0; // yyyyMMdd
     private int TODAY = 0;
@@ -44,22 +39,8 @@ public class TaskListFragment extends Fragment {
 
         super();
 
-        /*
-        this.listener = new onCheckedChangedListener() {
-            @Override
-            public void onCheckedChanged(Task task) {
-                viewModel.clearTask(task);
-            }
-        };*/
-
-        this.taskListAdapter= new TaskListAdapter(new ArrayList<Task>()); // , listener);
+        this.taskListAdapter= new TaskListAdapter(new ArrayList<>());
     }
-
-    /*
-    public interface onCheckedChangedListener {
-
-        void onCheckedChanged(Task task);
-    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,10 +53,10 @@ public class TaskListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
-
+        // shared viewModel
         this.taskListViewModel = new ViewModelProvider(requireActivity()).get(TaskListViewModel.class);
 
-        // fresh start, show TODAY; listviewmodel.DATE != 0 => data already loaded
+        // get TODAY date, apply yyyyMMdd format
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH); // returns a single digit, 0 for January 11 december
@@ -93,10 +74,12 @@ public class TaskListFragment extends Fragment {
         int now = Integer.parseInt(year + formatted_human_month_string + formatted_day_string);
         this.TODAY = now;
 
+        // for date in bottom sheet fragment (calendarView)
         TextView txtBottomSheetDay = view.findViewById(R.id.txtBottomSheetDay);
 
+        // fresh start, show TODAY; DATE==0 means data not loaded in viewModel yet
         if (TaskListViewModel.getDATE() == 0) {
-            // fresh start
+            // fresh start, load data for TODAY
             this.taskListViewModel.fetch(now);
             this.selectedDate = now;
 
@@ -112,14 +95,14 @@ public class TaskListFragment extends Fragment {
                             + year
             );
         } else {
-            // data loaded in viewmodel
+            // listViewModel.DATE != 0 and returns date as int yyyyMMdd => data already loaded into viewModel
             this.selectedDate = TaskListViewModel.getDATE();
 
             String date = String.valueOf(this.selectedDate); // yyyyMMdd
             year = Integer.parseInt(date.substring(0, 4));
             month = Integer.parseInt(date.substring(4, 6)); // STORING MONTH AS 1 FOR JANUARY 12 DECEMBER
             day = Integer.parseInt(date.substring(6));
-
+            // only date, setting time in CreateTaskFragment; old calendar instance used to get TODAY
             calendar.set(year, month - 1, day, 0, 0); // MONTH -1 FIX!!!
 
             Date datetime = calendar.getTime();
@@ -135,11 +118,11 @@ public class TaskListFragment extends Fragment {
             );
         }
 
-        RecyclerView recyclerView = view.findViewById(R.id.recTodoList);
+        RecyclerView recyclerView = view.findViewById(R.id.recTaskList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(this.taskListAdapter);
 
-        // bottom sheet dialog for calendar view
+        // bottom sheet fragment for calendarView
         LinearLayout bottomSheetLayout = view.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
         ImageView headerArrowImage = view.findViewById(R.id.bottomSheetArrow);
@@ -149,6 +132,7 @@ public class TaskListFragment extends Fragment {
 
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             } else {
+
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
@@ -162,7 +146,7 @@ public class TaskListFragment extends Fragment {
                 headerArrowImage.setRotation(slideOffset * -180);
             }
         });
-        // add new task button in bottomsheet
+        // "add new task" button in bottom sheet
         ImageView bottomSheetAdd = view.findViewById(R.id.bottomSheetAdd);
 
         CalendarView calendarView = view.findViewById(R.id.calendarView);
@@ -170,7 +154,7 @@ public class TaskListFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
-                // month: 0 for January 11 december; single digit dayOfMonth
+                // month: 0 for January 11 december; no leading zeros single digit format for month and dayOfMonth eg 1 2 3
                 // DATE INTEGER FORMAT
                 // add leading zero to month; required pattern yyyyMMdd
                 int human_month = month+1; // fix start of January as 0 to start with 1
@@ -201,7 +185,7 @@ public class TaskListFragment extends Fragment {
                                 + '-'
                                 + year
                 );
-                // hide new task button if date is not actual
+                // hide "add new task" button if date is not actual
                 if (selectedDate < TODAY) {
 
                     bottomSheetAdd.setVisibility(View.GONE);
@@ -226,7 +210,7 @@ public class TaskListFragment extends Fragment {
         this.taskListViewModel.getTaskLiveData().observe(getViewLifecycleOwner(), list -> {
 
             this.taskListAdapter.updateTaskList(list);
-            // empty tasklist text
+            // empty taskList text
             TextView txtEmpty = requireView().findViewById(R.id.txtEmpty);
             if (list.isEmpty()) {
 

@@ -36,6 +36,7 @@ public class TaskViewModel extends AndroidViewModel {
     }
 
     public void update(Task task) {
+
         this.taskRepository.update(task);
     }
 
@@ -51,6 +52,7 @@ public class TaskViewModel extends AndroidViewModel {
     }
 
     public LiveData<Task> getTaskLiveData() {
+
         return this.taskLD;
     }
 }

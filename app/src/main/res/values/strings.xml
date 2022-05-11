@@ -10,4 +10,9 @@
     <string name="pickdate">Pick Date</string>
     <string name="picktime">Pick Time</string>
     <string name="txtDetailsTaskFragmentTitle">Details</string>
+    <string name="duplicationtask">You\'ve already set task for this time. Change time</string>
+    <string name="taskcreated">Task created</string>
+    <string name="taskupdated">Task updated</string>
+    <string name="taskdeleted">Task deleted</string>
+    <string name="taskfinished">Task finished</string>
 </resources>

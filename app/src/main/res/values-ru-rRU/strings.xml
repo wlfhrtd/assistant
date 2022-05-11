@@ -11,4 +11,9 @@
     <string name="entertitle">Введите название</string>
     <string name="newtask">Новая задача</string>
     <string name="emptytasklist">У вас нет никаких задач. Создайте новую</string>
+    <string name="duplicationtask">У вас уже есть задача на это время. Выберите другое время</string>
+    <string name="taskcreated">Задача добавлена</string>
+    <string name="taskupdated">Задача обновлена</string>
+    <string name="taskdeleted">Задача удалена</string>
+    <string name="taskfinished">Задача завершена</string>
 </resources>

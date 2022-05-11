@@ -17,13 +17,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/emptytasklist"
-            app:layout_constraintBottom_toBottomOf="@+id/recTodoList"
+            app:layout_constraintBottom_toBottomOf="@+id/recTaskList"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/recTodoList"
-            app:layout_constraintTop_toTopOf="@+id/recTodoList" />
+            app:layout_constraintStart_toStartOf="@+id/recTaskList"
+            app:layout_constraintTop_toTopOf="@+id/recTaskList" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recTodoList"
+            android:id="@+id/recTaskList"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
